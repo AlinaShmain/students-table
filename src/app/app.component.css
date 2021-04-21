@@ -1,0 +1,44 @@
+.highlight {
+    background-color: red;
+}
+
+.searchButton {
+    width: 20px;
+    height: 20px;
+    /* background: #000000; */
+    /* text-align: center; */
+    /* border: 1px solid #fcad03; */
+    /* border-radius: 0 5px 5px 0; */
+    border: 0;
+    cursor: pointer;
+    background: url(../assets/loupe.svg);
+    /* background-position: 50%, 50%; */
+  }
+
+#students {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#students td,
+#students th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#students tr:nth-child(even) {
+  /* background-color: #f2f2f2; */
+}
+
+#students tr:hover {
+  background-color: #ddd;
+}
+
+#students th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: blueviolet;
+  color: white;
+}

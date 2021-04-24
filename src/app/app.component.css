@@ -1,19 +1,59 @@
-.highlight {
-    background-color: red;
+.rowColor:nth-child(even) {
+  background-color: #f2f2f2;
 }
 
-.searchButton {
-    width: 20px;
-    height: 20px;
-    /* background: #000000; */
-    /* text-align: center; */
-    /* border: 1px solid #fcad03; */
-    /* border-radius: 0 5px 5px 0; */
-    border: 0;
-    cursor: pointer;
-    background: url(../assets/loupe.svg);
-    /* background-position: 50%, 50%; */
-  }
+.highlight-red {
+  background-color: red;
+}
+
+.highlight-blueviolet {
+  background-color: blueviolet;
+}
+
+.open-search-button {
+  margin-left: 5px;
+  background: transparent;
+  text-align: center;
+  vertical-align: middle;
+  border: 0;
+  cursor: pointer;
+}
+
+.open-search-button:focus,
+.search-input:focus {
+  outline: none;
+}
+
+.open-search-button img {
+  width: 16px;
+  height: 16px;
+}
+
+.search {
+  display: flex;
+  margin: 0 auto;
+}
+
+.search-button {
+  width: 40px;
+  background: #fcad03;
+  text-align: center;
+  border: 1px solid #fcad03;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+}
+
+.search-button img {
+  width: 16px;
+  height: 16px;
+}
+
+.search-input {
+  border: 3px solid #fcad03;
+  padding: 5px;
+  border-radius: 5px;
+  color: #9dbfaf;
+}
 
 #students {
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
@@ -27,10 +67,6 @@
   padding: 8px;
 }
 
-#students tr:nth-child(even) {
-  /* background-color: #f2f2f2; */
-}
-
 #students tr:hover {
   background-color: #ddd;
 }
@@ -38,7 +74,52 @@
 #students th {
   padding-top: 12px;
   padding-bottom: 12px;
-  text-align: left;
+  text-align: center;
   background-color: blueviolet;
   color: white;
+}
+
+.drop-button {
+  width: 13px;
+  height: 15px;
+  vertical-align: middle;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+}
+
+.drop-button img {
+  width: 12px;
+  height: 12px;
+}
+
+.drop-button:hover,
+.drop-button:focus {
+  outline: none;
+}
+
+.arrow-up {
+  transform: rotate(180deg);
+}
+
+.cell {
+  position: relative;
+}
+
+.deleteBtn {
+  width: 25px;
+  height: 25px;
+  border: 1px solid black;
+  border-radius: 50%;
+  padding: 0;
+  text-align: center;
+  position: absolute;
+  right: 3px;
+  bottom: 5px;
+}
+
+.deleteBtn img {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
 }

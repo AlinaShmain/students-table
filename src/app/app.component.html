@@ -1,18 +1,80 @@
-<!-- import loupe from "../assets/loupe.svg"; -->
-
 <table id="students">
   <tr>
-    <th *ngFor = "let column of headers">
-      {{column}}
-      <button type="submit" class="searchButton">
-        <!-- <img/> -->
+    <th *ngFor="let column of headers">
+      {{ column }}
+      <button (click)="onToggleDown(column)" class="drop-button">
+        <img
+          src="../assets/arrow-down.svg"
+          [class]="{ 'arrow-up': downFlags[column] }"
+        />
       </button>
+      <button
+        type="submit"
+        class="open-search-button"
+        (click)="onOpenInput($event, column)"
+      >
+        <img
+          [attr.src]="
+            openFlags[column]
+              ? '../assets/times-solid.svg'
+              : '../assets/loupe.svg'
+          "
+          alt=""
+        />
+      </button>
+      <input
+        *ngIf="
+          column !== 'Средний Балл' &&
+          column !== 'Дата Рождения' &&
+          openFlags[column]
+        "
+        placeholder="Search..."
+        type="text"
+        class="search-input"
+        #inputSearch
+        (keyup)="onKey(inputSearch.value, column)"
+      />
+      <app-component-filter
+        *ngIf="column === 'Дата Рождения' && openFlags[column]"
+        [rows]="rows"
+        [column]="column"
+        (emitSetRows)="setRows($event)"
+      >
+      </app-component-filter>
+      <app-component-filter
+        *ngIf="column === 'Средний Балл' && openFlags[column]"
+        [rows]="rows"
+        [column]="column"
+        (emitSetRows)="setRows($event)"
+      >
+      </app-component-filter>
     </th>
   </tr>
 
-  <tr *ngFor = "let row of rows" [ngClass]="{ 'highlight': convertToNumber(row['Средний Бал']) < 3}">
-    <td *ngFor = "let column of headers">
-      {{row[column]}}
+  <tr
+    *ngFor="let row of rows"
+    [ngClass]="
+      isHighlight
+        ? {
+            'highlight-red': convertToNumber(row['Средний Балл']) < 3,
+            'highlight-blueviolet': foundStudents.includes(row)
+          }
+        : 'rowColor'
+    "
+  >
+    <td *ngFor="let column of headers" class="cell">
+      {{ row[column] }}
+      <button
+      class="deleteBtn"
+        *ngIf="column === 'Средний Балл'"
+        (click)="popup.toggleModule(row)"
+      >
+        <img src="../assets/times-solid.svg"/>
+      </button>
     </td>
   </tr>
 </table>
+
+<app-popup #popup (emitFunctionOfParent)="delete($event)"></app-popup>
+
+<button (click)="highlightController()">Отключить подсветку</button>

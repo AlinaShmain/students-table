@@ -1,0 +1,20 @@
+<form [formGroup]="formModel" (ngSubmit)="onSubmit()">
+  <div formGroupName="studentName">
+    <label>
+      Фамилия:
+      <input type="text" class="form-control" formControlName="lastName" required/>
+      <!-- <p>
+        Form Status: {{ studentName.status }}
+      </p> -->
+    </label>
+    <label>
+      Имя:
+      <input type="text" class="form-control" formControlName="firstName" required/>
+    </label>
+    <label>
+      Отчество:
+      <input type="text" class="form-control" formControlName="middleName" required/>
+    </label>
+  </div>
+  <button type="submit">Submit</button>
+</form>

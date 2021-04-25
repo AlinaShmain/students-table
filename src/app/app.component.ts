@@ -1,9 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input } from "@angular/core";
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.css"]
 })
 
 export class AppComponent {
@@ -36,8 +36,11 @@ export class AppComponent {
       "Отчество": "Юрьевна",
       "Дата Рождения": "07.03.95",
       "Средний Балл": "4"
-    }
+    },
   ];
+  bufferRows: Array<{ [key: string]: string }> = this.rows;
+  rows2: Array<{ [key: string]: string }> = this.rows;
+  rows3: Array<{ [key: string]: string }> = this.rows;
   isShowLastName: boolean = false;
   isShowFirstName: boolean = false;
   isShowMiddleName: boolean = false;
@@ -83,8 +86,8 @@ export class AppComponent {
 
       const regexp = new RegExp(`^${value}`, "g");
 
-      if (this.rows.length !== 0) {
-        this.rows.forEach((row) => {
+      if (this.bufferRows.length !== 0) {
+        this.bufferRows.forEach((row) => {
           const columnLowerCase = row[column].toLowerCase().trim();
           if (
             columnLowerCase.match(regexp)
@@ -100,60 +103,87 @@ export class AppComponent {
     if (this.downFlags[col]) {
       this.downFlags[col] = false;
 
-      if (col === this.headers[this.headers.length - 1] || col === this.headers[this.headers.length - 2]) {
+      if (col === "Дата Рождения") {
+        this.descendingSortDate(col);
+      } else if (col === "Средний Балл") {
         this.sortLargeToSmall(col);
       } else {
-        this.sortAlphabetically(col);
+        this.sortBackward(col);
       }
     } else {
       this.downFlags[col] = true;
 
-      if (col === this.headers[this.headers.length - 1] || col === this.headers[this.headers.length - 2]) {
+      if (col === "Дата Рождения") {
+        this.sortDate(col);
+      } else if (col === "Средний Балл") {
         this.sortSmallToLarge(col);
       } else {
-        this.sortBackward(col);
+        this.sortAlphabetically(col);
       }
     }
   }
 
-  sortSmallToLarge(col: string): void {
-    let sortedRows: Array<{ [key: string]: string }> = this.rows.sort((a: { [key: string]: string }, b: { [key: string]: string }) => parseInt(a[col], 10) - parseInt(b[col], 10));
+  convertToDate(dateStr: string): Date {
+    const dateArr = dateStr.split(".");
+    const yearVal = dateArr[2];
+    const yearNum = Number(yearVal);
+    const fullYear = (yearNum < 100) ? "19" + yearVal : "20" + yearVal;
+    dateStr = `${fullYear}-${dateArr[1]}-${dateArr[0]}T00:00:00Z`;
+    const date = new Date(dateStr);
+    return date;
+  }
 
-    this.rows = sortedRows;
-  };
+  sortDate(col: string): void {
+    const sortedRows: Array<{ [key: string]: string }> = this.bufferRows.sort((a: { [key: string]: string }, b: { [key: string]: string }) => this.convertToDate(a[col]).getTime() - this.convertToDate(b[col]).getTime());
+    this.bufferRows = sortedRows;
+  }
+
+  descendingSortDate (col: string): void {
+    const sortedRows: Array<{ [key: string]: string }> = this.bufferRows.sort((a: { [key: string]: string }, b: { [key: string]: string }) => this.convertToDate(b[col]).getTime() - this.convertToDate(a[col]).getTime());
+    this.bufferRows = sortedRows;
+  }
+
+  sortSmallToLarge(col: string): void {
+    const sortedRows: Array<{ [key: string]: string }> = this.bufferRows.sort((a: { [key: string]: string }, b: { [key: string]: string }) => this.convertToNumber(a[col]) - this.convertToNumber(b[col]));
+    this.bufferRows = sortedRows;
+  }
 
   sortLargeToSmall(col: string): void {
-    let sortedRows: Array<{ [key: string]: string }> = this.rows.sort((a: { [key: string]: string }, b: { [key: string]: string }) => parseInt(b[col], 10) - parseInt(a[col], 10));
-
-    this.rows = sortedRows;
+    const sortedRows: Array<{ [key: string]: string }> = this.bufferRows.sort((a: { [key: string]: string }, b: { [key: string]: string }) => this.convertToNumber(b[col]) - this.convertToNumber(a[col]));
+    this.bufferRows = sortedRows;
   }
 
   sortAlphabetically(col: string): void {
-    let sortedRows: Array<{ [key: string]: string }> = this.rows.sort((a: { [key: string]: string }, b: { [key: string]: string }) =>
-      a[col].localeCompare(b[col])
+    const sortedRows: Array<{ [key: string]: string }> = this.bufferRows.sort((a: { [key: string]: string }, b: { [key: string]: string }) =>
+      a[col].localeCompare(b[col]),
     );
-
-    this.rows = sortedRows;
+    this.bufferRows = sortedRows;
   }
 
   sortBackward(col: string): void {
-    let sortedRows: Array<{ [key: string]: string }> = this.rows.sort((a: { [key: string]: string }, b: { [key: string]: string }) =>
-      b[col].localeCompare(a[col])
+    const sortedRows: Array<{ [key: string]: string }> = this.bufferRows.sort((a: { [key: string]: string }, b: { [key: string]: string }) =>
+      b[col].localeCompare(a[col]),
     );
-
-    this.rows = sortedRows;
+    this.bufferRows = sortedRows;
   }
 
   setRows(newRows: Array<{ [key: string]: string }>): void {
-    console.log(newRows);
-    this.rows = newRows;
+    this.bufferRows = newRows;
+  }
+
+  setRows2(filteredRows: Array<{ [key: string]: string }>): void {
+    this.rows2 = filteredRows;
+  }
+
+  setRows3(filteredRows: Array<{ [key: string]: string }>): void {
+    this.rows3 = filteredRows;
   }
 
   highlightController(): void {
     this.isHighlight = !this.isHighlight;
   }
 
-  delete(rowToDelete: { [key: string]: string }) {
-    this.rows = this.rows.filter((row) => row !== rowToDelete);
+  delete(rowToDelete: { [key: string]: string }): void {
+    this.bufferRows = this.bufferRows.filter((row) => row !== rowToDelete);
   }
 }

@@ -2,12 +2,12 @@
   <div class="wrapper-filter">
     Day:
     <div class="dropdown">
-      <select class="dropdown-content" [(ngModel)]="selectedFromDay">
-        <option disabled value="From">From</option>
-        <option *ngFor="let day of days" [value]="day">{{ day }}</option>
+      <select class="dropdown-content" [(ngModel)]="selectedFromDay" (ngModelChange)="saveDateContext()">
+        <option disabled selected>From</option>
+        <option *ngFor="let day of days">{{ day }}</option>
       </select>
       <div class="dash">-</div>
-      <select class="dropdown-content" [(ngModel)]="selectedToDay">
+      <select class="dropdown-content" [(ngModel)]="selectedToDay" (ngModelChange)="saveDateContext()">
         <option disabled selected>To</option>
         <option *ngFor="let day of days">{{ day }}</option>
       </select>
@@ -16,12 +16,12 @@
   <div class="wrapper-filter">
     Month:
     <div class="dropdown">
-      <select class="dropdown-content" [(ngModel)]="selectedFromMonth">
+      <select class="dropdown-content" [(ngModel)]="selectedFromMonth" (ngModelChange)="saveDateContext()">
         <option disabled selected>From</option>
         <option *ngFor="let month of monthsName">{{ month }}</option>
       </select>
       <div class="dash">-</div>
-      <select class="dropdown-content" [(ngModel)]="selectedToMonth">
+      <select class="dropdown-content" [(ngModel)]="selectedToMonth" (ngModelChange)="saveDateContext()">
         <option disabled selected>To</option>
         <option *ngFor="let month of monthsName">{{ month }}</option>
       </select>
@@ -30,30 +30,32 @@
   <div class="wrapper-filter">
     Year:
     <div class="dropdown">
-      <select class="dropdown-content" [(ngModel)]="selectedFromYear">
+      <select class="dropdown-content" [(ngModel)]="selectedFromYear" (ngModelChange)="saveDateContext()">
         <option disabled selected>From</option>
         <option *ngFor="let year of years">{{ year }}</option>
       </select>
       <div class="dash">-</div>
-      <select class="dropdown-content" [(ngModel)]="selectedToYear">
+      <select class="dropdown-content" [(ngModel)]="selectedToYear" (ngModelChange)="saveDateContext()">
         <option disabled selected>To</option>
         <option *ngFor="let year of years">{{ year }}</option>
       </select>
     </div>
   </div>
   <button (click)="onFilterDate()">Filter</button>
+  <button (click)="onResetFilter()">Reset</button>
 </div>
 <div *ngIf="column === 'Средний Балл'">
   <div class="dropdown">
-    <select class="dropdown-content" [(ngModel)]="selectedFromScore">
+    <select class="dropdown-content" [(ngModel)]="selectedFromScore" (ngModelChange)="saveScoreContext()">
       <option disabled selected>From</option>
       <option *ngFor="let score of scores">{{ score }}</option>
     </select>
     <div class="dash">-</div>
-    <select class="dropdown-content" [(ngModel)]="selectedToScore">
+    <select class="dropdown-content" [(ngModel)]="selectedToScore" (ngModelChange)="saveScoreContext()">
       <option disabled selected>To</option>
       <option *ngFor="let score of scores">{{ score }}</option>
     </select>
   </div>
   <button (click)="onFilterScore()">Filter</button>
+  <button (click)="onResetFilter()">Reset</button>
 </div>

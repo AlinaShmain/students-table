@@ -1,22 +1,25 @@
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from "@angular/core";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { BrowserModule } from "@angular/platform-browser";
 
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { FormsModule }   from '@angular/forms';
-import { ComponentFilterComponent } from './component-filter/component-filter.component';
-import { PopupComponent } from './component-popup/component-popup.component';
+import { AppRoutingModule } from "./app-routing.module";
+import { AppComponent } from "./app.component";
+import { ComponentFilterComponent } from "./component-filter/component-filter.component";
+import { ComponentFormComponent } from "./component-form/component-form.component";
+import { PopupComponent } from "./component-popup/component-popup.component";
 
 @NgModule({
   declarations: [
     AppComponent,
     ComponentFilterComponent,
-    PopupComponent
+    PopupComponent,
+    ComponentFormComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

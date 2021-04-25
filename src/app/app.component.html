@@ -35,24 +35,21 @@
         (keyup)="onKey(inputSearch.value, column)"
       />
       <app-component-filter
-        *ngIf="column === 'Дата Рождения' && openFlags[column]"
+        *ngIf="(column === 'Дата Рождения' || column === 'Средний Балл') && openFlags[column]"
         [rows]="rows"
+        [rows2]="rows2"
+        [rows3]="rows3"
         [column]="column"
         (emitSetRows)="setRows($event)"
-      >
-      </app-component-filter>
-      <app-component-filter
-        *ngIf="column === 'Средний Балл' && openFlags[column]"
-        [rows]="rows"
-        [column]="column"
-        (emitSetRows)="setRows($event)"
+        (emitSetRows2)="setRows2($event)"
+        (emitSetRows3)="setRows3($event)"
       >
       </app-component-filter>
     </th>
   </tr>
 
   <tr
-    *ngFor="let row of rows"
+    *ngFor="let row of bufferRows"
     [ngClass]="
       isHighlight
         ? {
@@ -65,11 +62,11 @@
     <td *ngFor="let column of headers" class="cell">
       {{ row[column] }}
       <button
-      class="deleteBtn"
+        class="deleteBtn"
         *ngIf="column === 'Средний Балл'"
         (click)="popup.toggleModule(row)"
       >
-        <img src="../assets/times-solid.svg"/>
+        <img src="../assets/times-solid.svg" />
       </button>
     </td>
   </tr>
@@ -78,3 +75,8 @@
 <app-popup #popup (emitFunctionOfParent)="delete($event)"></app-popup>
 
 <button (click)="highlightController()">Отключить подсветку</button>
+
+<app-component-form
+  [rows]="rows"
+  (emitSetRows)="setRows($event)"
+></app-component-form>

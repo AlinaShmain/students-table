@@ -35,7 +35,10 @@
         (keyup)="onKey(inputSearch.value, column)"
       />
       <app-component-filter
-        *ngIf="(column === 'Дата Рождения' || column === 'Средний Балл') && openFlags[column]"
+        *ngIf="
+          (column === 'Дата Рождения' || column === 'Средний Балл') &&
+          openFlags[column]
+        "
         [rows]="rows"
         [rows2]="rows2"
         [rows3]="rows3"
@@ -61,8 +64,12 @@
   >
     <td *ngFor="let column of headers" class="cell">
       {{ row[column] }}
-      <button class="editBtn" *ngIf="column === 'Средний Балл'" (click)="popupEdit.toggleModule('edit', row)">
-        <img src="../assets/edit-solid.svg"/>
+      <button
+        class="editBtn"
+        *ngIf="column === 'Средний Балл'"
+        (click)="popupEdit.toggleModule('edit', row)"
+      >
+        <img src="../assets/edit-solid.svg" />
       </button>
       <button
         class="deleteBtn"
@@ -74,9 +81,23 @@
     </td>
   </tr>
 </table>
-<button class="createBtn" (click)="popupEdit.toggleModule('create')">Add new user</button>
+
+<div class="group-buttons">
+  <button
+    class="primaryBtn createBtn"
+    (click)="popupEdit.toggleModule('create')"
+  >
+    Добавить студента
+    <img src="../assets/plus-solid.svg" />
+  </button>
+  <button class="primaryBtn" (click)="highlightController()">
+    Отключить подсветку
+  </button>
+</div>
 
 <app-popup #popupDelete (emitDelete)="delete($event)"></app-popup>
-<app-popup #popupEdit (emitEditRow)="edit($event)" (emitAddRow)="add($event)"></app-popup>
-
-<button (click)="highlightController()">Отключить подсветку</button>
+<app-popup
+  #popupEdit
+  (emitEditRow)="edit($event)"
+  (emitAddRow)="add($event)"
+></app-popup>

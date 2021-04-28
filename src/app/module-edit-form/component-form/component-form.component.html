@@ -1,11 +1,13 @@
 <form [formGroup]="formModel" (ngSubmit)="onSubmit()" class="form-model">
-  <h3 *ngIf="isOpenCreateContent">Добавление студента</h3>
-  <h3 *ngIf="isOpenEditContent">Редактирование студента</h3>
+  <div class="header-form">
+    <h3 *ngIf="isOpenCreateContent">Добавление студента</h3>
+    <h3 *ngIf="isOpenEditContent">Редактирование студента</h3>
+  </div>
   <div formGroupName="studentName" class="form-group">
     <!-- <div *ngFor="let input of inputs" class="pad-input">
     </div> -->
     <div class="input-group">
-      <label for="lastName" class="input-label"> Фамилия </label>
+      <!-- <label for="lastName" class="input-label"> Фамилия </label> -->
       <input
         type="text"
         placeholder="Введите фамилию..."
@@ -56,7 +58,7 @@
       </div>
     </div>
     <div class="input-group">
-      <label for="firstName" class="input-label"> Имя </label>
+      <!-- <label for="firstName" class="input-label"> Имя </label> -->
       <input
         type="text"
         placeholder="Введите имя..."
@@ -107,7 +109,7 @@
       </div>
     </div>
     <div class="input-group">
-      <label for="middleName" class="input-label"> Отчество </label>
+      <!-- <label for="middleName" class="input-label"> Отчество </label> -->
       <input
         type="text"
         placeholder="Введите отчество..."
@@ -172,7 +174,7 @@
     </div>
   </div>
   <div class="input-group">
-    <label for="dateBirth" class="input-label"> Дата Рождения </label>
+    <!-- <label for="dateBirth" class="input-label"> Дата Рождения </label> -->
     <input
       type="date"
       placeholder="дд.мм.гг"
@@ -223,7 +225,7 @@
     </div>
   </div>
   <div class="input-group">
-    <label for="averageScore" class="input-label"> Средний балл </label>
+    <!-- <label for="averageScore" class="input-label"> Средний балл </label> -->
     <input
       type="text"
       placeholder="Введите средний балл..."

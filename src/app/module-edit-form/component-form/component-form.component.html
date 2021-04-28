@@ -1,0 +1,286 @@
+<form [formGroup]="formModel" (ngSubmit)="onSubmit()" class="form-model">
+  <h3 *ngIf="isOpenCreateContent">Добавление студента</h3>
+  <h3 *ngIf="isOpenEditContent">Редактирование студента</h3>
+  <div formGroupName="studentName" class="form-group">
+    <!-- <div *ngFor="let input of inputs" class="pad-input">
+    </div> -->
+    <div class="input-group">
+      <label for="lastName" class="input-label"> Фамилия </label>
+      <input
+        type="text"
+        placeholder="Введите фамилию..."
+        class="form-control"
+        [ngClass]="
+          submitted && lastName && lastName.invalid ? 'submitted-invalid' : ''
+        "
+        formControlName="lastName"
+        required
+      />
+      <div
+        *ngIf="
+          (lastName &&
+            lastName.invalid &&
+            (lastName.dirty || lastName.touched)) ||
+          (submitted && lastName && lastName.invalid)
+        "
+        class="status-icon"
+      >
+        <img src="../../assets/exclamation-triangle-solid.svg" />
+      </div>
+      <div
+        *ngIf="
+          (lastName &&
+            lastName.valid &&
+            (lastName.dirty || lastName.touched)) ||
+          (submitted && lastName && lastName.valid)
+        "
+        class="status-icon"
+      >
+        <img src="../../assets/check-solid.svg" />
+      </div>
+      <div
+        *ngIf="
+          (lastName &&
+            lastName.invalid &&
+            (lastName.dirty || lastName.touched)) ||
+          (submitted && lastName && lastName.invalid)
+        "
+        class="error-messages"
+      >
+        <div
+          *ngFor="let error of getErrorsControl('lastName')"
+          class="text-danger"
+        >
+          {{ getErrorMessage(error) }}
+        </div>
+      </div>
+    </div>
+    <div class="input-group">
+      <label for="firstName" class="input-label"> Имя </label>
+      <input
+        type="text"
+        placeholder="Введите имя..."
+        class="form-control"
+        [ngClass]="
+          submitted && firstName && firstName.invalid ? 'submitted-invalid' : ''
+        "
+        formControlName="firstName"
+        required
+      />
+      <div
+        *ngIf="
+          (firstName &&
+            firstName.invalid &&
+            (firstName.dirty || firstName.touched)) ||
+          (submitted && firstName && firstName.invalid)
+        "
+        class="status-icon"
+      >
+        <img src="../../assets/exclamation-triangle-solid.svg" />
+      </div>
+      <div
+        *ngIf="
+          (firstName &&
+            firstName.valid &&
+            (firstName.dirty || firstName.touched)) ||
+          (submitted && firstName && firstName.valid)
+        "
+        class="status-icon"
+      >
+        <img src="../../assets/check-solid.svg" />
+      </div>
+      <div
+        *ngIf="
+          (firstName &&
+            firstName.invalid &&
+            (firstName.dirty || firstName.touched)) ||
+          (submitted && firstName && firstName.invalid)
+        "
+        class="error-messages"
+      >
+        <div
+          *ngFor="let error of getErrorsControl('firstName')"
+          class="text-danger"
+        >
+          {{ getErrorMessage(error) }}
+        </div>
+      </div>
+    </div>
+    <div class="input-group">
+      <label for="middleName" class="input-label"> Отчество </label>
+      <input
+        type="text"
+        placeholder="Введите отчество..."
+        class="form-control"
+        [ngClass]="
+          submitted && middleName && middleName.invalid
+            ? 'submitted-invalid'
+            : ''
+        "
+        formControlName="middleName"
+        required
+      />
+      <div
+        *ngIf="
+          (middleName &&
+            middleName.invalid &&
+            (middleName.dirty || middleName.touched)) ||
+          (submitted && middleName && middleName.invalid)
+        "
+        class="status-icon"
+      >
+        <img src="../../assets/exclamation-triangle-solid.svg" />
+      </div>
+      <div
+        *ngIf="
+          (middleName &&
+            middleName.valid &&
+            (middleName.dirty || middleName.touched)) ||
+          (submitted && middleName && middleName.valid)
+        "
+        class="status-icon"
+      >
+        <img src="../../assets/check-solid.svg" />
+      </div>
+      <div
+        *ngIf="
+          (middleName &&
+            middleName.invalid &&
+            (middleName.dirty || middleName.touched)) ||
+          (submitted && middleName && middleName.invalid)
+        "
+        class="error-messages"
+      >
+        <div
+          *ngFor="let error of getErrorsControl('middleName')"
+          class="text-danger"
+        >
+          {{ getErrorMessage(error) }}
+        </div>
+      </div>
+    </div>
+    <div
+      *ngIf="errorsFormGroup && errorsFormGroup.length > 0"
+      class="error-messages"
+    >
+      <div
+        *ngFor="let error of getErrorsFormGroup('studentName')"
+        class="text-danger"
+      >
+        {{ getErrorFormGroupMessage(error) }}
+      </div>
+    </div>
+  </div>
+  <div class="input-group">
+    <label for="dateBirth" class="input-label"> Дата Рождения </label>
+    <input
+      type="date"
+      placeholder="дд.мм.гг"
+      class="form-control"
+      [ngClass]="
+        submitted && dateBirth && dateBirth.invalid ? 'submitted-invalid' : ''
+      "
+      formControlName="dateBirth"
+      required
+    />
+    <!-- <div
+      *ngIf="
+        (dateBirth &&
+          dateBirth.invalid &&
+          (dateBirth.dirty || dateBirth.touched)) ||
+        (submitted && dateBirth && dateBirth.invalid)
+      "
+      class="status-icon"
+    >
+      <img src="../../assets/exclamation-triangle-solid.svg" />
+    </div> -->
+    <!-- <div
+      *ngIf="
+        (dateBirth &&
+          dateBirth.valid &&
+          (dateBirth.dirty || dateBirth.touched)) ||
+        (submitted && dateBirth && dateBirth.valid)
+      "
+      class="status-icon"
+    >
+      <img src="../../assets/check-solid.svg" />
+    </div> -->
+    <div
+      *ngIf="
+        (dateBirth &&
+          dateBirth.invalid &&
+          (dateBirth.dirty || dateBirth.touched)) ||
+        (submitted && dateBirth && dateBirth.invalid)
+      "
+      class="error-messages"
+    >
+      <div
+        *ngFor="let error of getErrorsControl('dateBirth')"
+        class="text-danger"
+      >
+        {{ getErrorMessage(error) }}
+      </div>
+    </div>
+  </div>
+  <div class="input-group">
+    <label for="averageScore" class="input-label"> Средний балл </label>
+    <input
+      type="text"
+      placeholder="Введите средний балл..."
+      class="form-control"
+      [ngClass]="
+        submitted && averageScore && averageScore.invalid
+          ? 'submitted-invalid'
+          : ''
+      "
+      formControlName="averageScore"
+      required
+    />
+    <div
+      *ngIf="
+        (averageScore &&
+          averageScore.invalid &&
+          (averageScore.dirty || averageScore.touched)) ||
+        (submitted && averageScore && averageScore.invalid)
+      "
+      class="status-icon"
+    >
+      <img src="../../assets/exclamation-triangle-solid.svg" />
+    </div>
+    <div
+      *ngIf="
+        (averageScore &&
+          averageScore.valid &&
+          (averageScore.dirty || averageScore.touched)) ||
+        (submitted && averageScore && averageScore.valid)
+      "
+      class="status-icon"
+    >
+      <img src="../../assets/check-solid.svg" />
+    </div>
+    <div
+      *ngIf="
+        (averageScore &&
+          averageScore.invalid &&
+          (averageScore.dirty || averageScore.touched)) ||
+        (submitted && averageScore && averageScore.invalid)
+      "
+      class="error-messages"
+    >
+      <div
+        *ngFor="let error of getErrorsControl('averageScore')"
+        class="text-danger"
+      >
+        {{ getErrorMessage(error) }}
+      </div>
+    </div>
+  </div>
+  <div class="center-button">
+    <button type="submit" class="submit-button" *ngIf="isOpenCreateContent">
+      Add user
+    </button>
+    <button type="submit" class="submit-button" *ngIf="isOpenEditContent">
+      Edit user
+    </button>
+  </div>
+</form>

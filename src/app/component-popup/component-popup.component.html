@@ -1,5 +1,23 @@
-<div class="popup-content-wrapper" *ngIf="isOpen">
-    <button class="popup-close-button" (click)="closeModule()">x</button>
-    <p class="popup-text">Are you sure you want to delete this person?</p>
-    <button class="popup-delete-button" (click)="delete()">delete</button>
+<div class="dark-theme" *ngIf="isOpen">
+  <div class="popup-content-wrapper">
+    <button class="popup-close-button" (click)="closeModule()">
+      <img src="../../assets/times-solid.svg" />
+    </button>
+    <div class="popup-delete-wrapper" *ngIf="isOpenDeleteContent">
+      <p class="popup-text">Are you sure you want to delete this person?</p>
+      <button class="popup-delete-button" (click)="delete()">delete</button>
+    </div>
+    <div
+      class="popup-form-wrapper"
+      *ngIf="isOpenEditContent || isOpenCreateContent"
+    >
+      <app-component-form
+        (emitEditRow)="edit($event)"
+        (emitAddRow)="add($event)"
+        [rowToEdit]="tableRow"
+        [isOpenEditContent]="isOpenEditContent"
+        [isOpenCreateContent]="isOpenCreateContent"
+      ></app-component-form>
+    </div>
+  </div>
 </div>

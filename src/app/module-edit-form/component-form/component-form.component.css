@@ -1,0 +1,66 @@
+.form-model {
+  width: 300px;
+}
+
+.form-group {
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 5px;
+  position: relative;
+}
+
+.form-control {
+  border: 2px solid;
+  margin-top: 5px;
+  padding: 5px;
+}
+
+.form-control:focus {
+  outline: none;
+}
+
+.ng-valid.ng-dirty:not(.form-group),
+.ng-valid.ng-dirty:not(.form-group),
+.submitted-valid {
+  border-color: #42a948;
+}
+
+.ng-invalid.ng-dirty:not(form):not(.form-group),
+.submitted-invalid {
+  border-color: #c33;
+}
+
+.status-icon {
+  position: absolute;
+  right: 6px;
+  top: 30px;
+}
+
+.status-icon img {
+  width: 16px;
+  height: 16px;
+}
+
+.error-messages {
+  background-color: #fee;
+  color: #c33;
+  padding: 5px;
+  font-size: 14px;
+}
+
+.center-button {
+  /* display: flex;
+  justify-content: center; */
+  text-align: center;
+}
+
+.submit-button {
+  margin-top: 10px;
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 5px 8px;
+}

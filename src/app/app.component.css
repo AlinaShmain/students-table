@@ -106,7 +106,7 @@
   position: relative;
 }
 
-.deleteBtn {
+.deleteBtn, .editBtn {
   width: 25px;
   height: 25px;
   border: 1px solid black;
@@ -114,12 +114,20 @@
   padding: 0;
   text-align: center;
   position: absolute;
-  right: 3px;
   bottom: 5px;
 }
 
-.deleteBtn img {
+.deleteBtn {
+  right: 3px;
+}
+
+.editBtn {
+  right: 33px;
+}
+
+.deleteBtn img, .editBtn img {
   width: 16px;
   height: 16px;
   vertical-align: middle;
 }
+

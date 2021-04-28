@@ -1,20 +1,51 @@
+.dark-theme {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+  transition: 1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .popup-content-wrapper {
-  position: fixed;
-  top: 10%;
-  right: 30%;
-  bottom: 70%;
-  left: 30%;
+  width: fit-content;
+  position: relative;
+  padding: 30px 10px;
+  /* padding: 10px; */
   background-color: white;
   border: solid;
   border-color: black;
+  border-radius: 5px;
+  /* text-align: center; */
+}
+
+.popup-form-wrapper {
+  /* position: relative; */
+  /* top: 5px; */
+}
+
+.popup-delete-wrapper {
   text-align: center;
 }
 
 .popup-close-button {
   position: absolute;
-  right: 0;
+  right: 3px;
+  top: 3px;
+  padding: 0;
+}
+
+.popup-close-button img {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
 }
 
 .popup-text {
-    margin-top: 30px;
+  margin-top: 30px;
 }

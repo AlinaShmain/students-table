@@ -13,28 +13,28 @@ export class AppComponent {
       "Фамилия": "Иванов",
       "Имя": "Иван",
       "Отчество": "Иванович",
-      "Дата Рождения": "01.01.97",
+      "Дата Рождения": "01.01.1997",
       "Средний Балл": "4"
     },
     {
       "Фамилия": "Петрова",
       "Имя": "Мария",
       "Отчество": "Сергеевна",
-      "Дата Рождения": "03.06.98",
+      "Дата Рождения": "03.06.1998",
       "Средний Балл": "5"
     },
     {
       "Фамилия": "Крылов",
       "Имя": "Александр",
       "Отчество": "Сергеевич",
-      "Дата Рождения": "20.06.98",
+      "Дата Рождения": "20.06.1998",
       "Средний Балл": "2"
     },
     {
       "Фамилия": "Есенина",
       "Имя": "Мария",
       "Отчество": "Юрьевна",
-      "Дата Рождения": "07.03.95",
+      "Дата Рождения": "07.03.1995",
       "Средний Балл": "4"
     },
   ];
@@ -126,9 +126,9 @@ export class AppComponent {
   convertToDate(dateStr: string): Date {
     const dateArr = dateStr.split(".");
     const yearVal = dateArr[2];
-    const yearNum = Number(yearVal);
-    const fullYear = (yearNum < 100) ? "19" + yearVal : "20" + yearVal;
-    dateStr = `${fullYear}-${dateArr[1]}-${dateArr[0]}T00:00:00Z`;
+    // const yearNum = Number(yearVal);
+    // const fullYear = (yearNum < 100) ? "19" + yearVal : "20" + yearVal;
+    dateStr = `${yearVal}-${dateArr[1]}-${dateArr[0]}T00:00:00Z`;
     const date = new Date(dateStr);
     return date;
   }
@@ -138,7 +138,7 @@ export class AppComponent {
     this.bufferRows = sortedRows;
   }
 
-  descendingSortDate (col: string): void {
+  descendingSortDate(col: string): void {
     const sortedRows: Array<{ [key: string]: string }> = this.bufferRows.sort((a: { [key: string]: string }, b: { [key: string]: string }) => this.convertToDate(b[col]).getTime() - this.convertToDate(a[col]).getTime());
     this.bufferRows = sortedRows;
   }
@@ -185,5 +185,18 @@ export class AppComponent {
 
   delete(rowToDelete: { [key: string]: string }): void {
     this.bufferRows = this.bufferRows.filter((row) => row !== rowToDelete);
+  }
+
+  edit(data: { currentRow: { [key: string]: string } | undefined, editedRow: { [key: string]: string } | undefined }): void {
+    // console.log(data);
+    if (data.editedRow !== undefined) {
+      this.bufferRows.splice(this.bufferRows.findIndex((row) => (row) === data.currentRow), 1, data.editedRow);
+    }
+  }
+
+  add(row: { [key: string]: string }): void {
+    // console.log("add");
+    // console.log(row);
+    this.bufferRows.push(row);
   }
 }

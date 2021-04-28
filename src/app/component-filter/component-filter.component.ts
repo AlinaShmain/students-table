@@ -80,7 +80,6 @@ export class ComponentFilterComponent implements OnInit {
   emitSetRows3: EventEmitter<Array<{ [key: string]: string }>> = new EventEmitter<Array<{ [key: string]: string }>>();
 
   ngOnInit(): void {
-    // this.rows3 = this.rows;
   }
 
   getDay(date: string): number {
@@ -92,10 +91,10 @@ export class ComponentFilterComponent implements OnInit {
   }
 
   getYear(date: string): number {
-    const yearVal = date.split(".")[2];
-    const yearNum = Number(yearVal);
-    const fullYear = (yearNum < 100) ? "19" + yearVal : "20" + yearVal;
-    return Number(fullYear);
+    // const yearVal = date.split(".")[2];
+    // const yearNum = Number(yearVal);
+    // const fullYear = (yearNum < 100) ? "19" + yearVal : "20" + yearVal;
+    return Number(date.split(".")[2]);
   }
 
   onFilterDate(): void {
@@ -138,12 +137,10 @@ export class ComponentFilterComponent implements OnInit {
       }
     }
     if (this.selectedFromScore !== "From" || this.selectedToScore !== "To") {
-      // this.rows3 = this.rows2;
       this.emitSetRows3.emit(this.rows2);
       console.log(this.rows3);
     }
     this.emitSetRows2.emit(filteredRows);
-    // console.log(this.rows2);
     this.emitSetRows.emit(filteredRows);
   }
 
@@ -181,7 +178,6 @@ export class ComponentFilterComponent implements OnInit {
       localStorage.removeItem("selectedToScore");
     }
     // localStorage.clear();
-    // this.rows2 = this.rows;
     this.emitSetRows2.emit(this.rows);
     this.emitSetRows.emit(this.rows3);
   }

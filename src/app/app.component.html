@@ -61,22 +61,22 @@
   >
     <td *ngFor="let column of headers" class="cell">
       {{ row[column] }}
+      <button class="editBtn" *ngIf="column === 'Средний Балл'" (click)="popupEdit.toggleModule('edit', row)">
+        <img src="../assets/edit-solid.svg"/>
+      </button>
       <button
         class="deleteBtn"
         *ngIf="column === 'Средний Балл'"
-        (click)="popup.toggleModule(row)"
+        (click)="popupDelete.toggleModule('delete', row)"
       >
         <img src="../assets/times-solid.svg" />
       </button>
     </td>
   </tr>
 </table>
+<button class="createBtn" (click)="popupEdit.toggleModule('create')">Add new user</button>
 
-<app-popup #popup (emitFunctionOfParent)="delete($event)"></app-popup>
+<app-popup #popupDelete (emitDelete)="delete($event)"></app-popup>
+<app-popup #popupEdit (emitEditRow)="edit($event)" (emitAddRow)="add($event)"></app-popup>
 
 <button (click)="highlightController()">Отключить подсветку</button>
-
-<app-component-form
-  [rows]="rows"
-  (emitSetRows)="setRows($event)"
-></app-component-form>

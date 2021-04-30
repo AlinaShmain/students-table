@@ -68,6 +68,8 @@ export class AppComponent {
     "Средний Бал": this.isDownScore
   };
   isHighlight: boolean = true;
+  isEnable: boolean = false;
+  isActivateCalculate: boolean = false;
 
   convertToNumber(val: string): number {
     return parseInt(val, 10);
@@ -123,11 +125,17 @@ export class AppComponent {
     }
   }
 
+  onToggleScale(): void {
+    this.isEnable = !this.isEnable;
+  }
+
+  onCalculate(): void {
+    this.isActivateCalculate = !this.isActivateCalculate;
+  }
+
   convertToDate(dateStr: string): Date {
     const dateArr = dateStr.split(".");
     const yearVal = dateArr[2];
-    // const yearNum = Number(yearVal);
-    // const fullYear = (yearNum < 100) ? "19" + yearVal : "20" + yearVal;
     dateStr = `${yearVal}-${dateArr[1]}-${dateArr[0]}T00:00:00Z`;
     const date = new Date(dateStr);
     return date;
@@ -188,15 +196,12 @@ export class AppComponent {
   }
 
   edit(data: { currentRow: { [key: string]: string } | undefined, editedRow: { [key: string]: string } | undefined }): void {
-    // console.log(data);
     if (data.editedRow !== undefined) {
       this.bufferRows.splice(this.bufferRows.findIndex((row) => (row) === data.currentRow), 1, data.editedRow);
     }
   }
 
   add(row: { [key: string]: string }): void {
-    // console.log("add");
-    // console.log(row);
     this.bufferRows.push(row);
   }
 }

@@ -10,8 +10,8 @@
 
 .dropdown {
   display: flex;
-  justify-content: space-between;
-  /* width: 150px; */
+  justify-content: center;
+  margin-bottom: 5px;
 }
 
 .dropdown-content {

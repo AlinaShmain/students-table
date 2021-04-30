@@ -1,28 +1,22 @@
 <table id="students">
-  <tr>
-    <th *ngFor="let column of headers">
-      {{ column }}
-      <button (click)="onToggleDown(column)" class="drop-button">
-        <img
-          src="../assets/arrow-down.svg"
-          [class]="{ 'arrow-up': downFlags[column] }"
-        />
-      </button>
-      <button
-        type="submit"
-        class="open-search-button"
-        (click)="onOpenInput($event, column)"
-      >
-        <img
-          [attr.src]="
-            openFlags[column]
-              ? '../assets/times-solid.svg'
-              : '../assets/loupe.svg'
-          "
-          alt=""
-        />
-      </button>
-      <input
+  <thead>
+    <tr>
+      <th *ngFor="let column of headers">
+        {{ column }}
+        <button (click)="onToggleDown(column)" class="icon-button drop-button">
+          <img
+            src="../assets/arrow-down.svg"
+            [class]="{ 'arrow-up': downFlags[column] }"
+          />
+        </button>
+        <button
+          class="icon-button open-search-button"
+          (click)="onOpenInput($event, column)"
+          appToggleIcon
+          img-src-1="../assets/loupe.svg"
+          img-src-2="../assets/times-solid.svg"
+        ></button>
+        <!-- <input
         *ngIf="
           column !== 'Средний Балл' &&
           column !== 'Дата Рождения' &&
@@ -33,25 +27,61 @@
         class="search-input"
         #inputSearch
         (keyup)="onKey(inputSearch.value, column)"
-      />
-      <app-component-filter
-        *ngIf="
-          (column === 'Дата Рождения' || column === 'Средний Балл') &&
-          openFlags[column]
-        "
-        [rows]="rows"
-        [rows2]="rows2"
-        [rows3]="rows3"
-        [column]="column"
-        (emitSetRows)="setRows($event)"
-        (emitSetRows2)="setRows2($event)"
-        (emitSetRows3)="setRows3($event)"
-      >
-      </app-component-filter>
-    </th>
-  </tr>
+      /> -->
+        <input
+          *ngIf="
+            column !== 'Средний Балл' &&
+            column !== 'Дата Рождения' &&
+            openFlags[column]
+          "
+          placeholder="Search..."
+          type="text"
+          class="search-input"
+          appHighlightFound
+          [column]="column"
+        />
+        <app-component-filter
+          *ngIf="
+            (column === 'Дата Рождения' || column === 'Средний Балл') &&
+            openFlags[column]
+          "
+          [rows]="rows"
+          [rows2]="rows2"
+          [rows3]="rows3"
+          [column]="column"
+          (emitSetRows)="setRows($event)"
+          (emitSetRows2)="setRows2($event)"
+          (emitSetRows3)="setRows3($event)"
+        >
+        </app-component-filter>
+        <div *ngIf="column === 'Средний Балл'" class="toggle-score-scale">
+          Включить десятибальную систему
+          <button
+            class="icon-button toggle-scale-button"
+            (click)="onToggleScale()"
+            appToggleIcon
+            img-src-1="../assets/toggle.svg"
+            img-src-2="../assets/enable.svg"
+          ></button>
+        </div>
+      </th>
+    </tr>
+  </thead>
 
-  <tr
+  <tbody>
+    <tr
+      *ngFor="let row of bufferRows"
+      [ngClass]="
+        isHighlight
+          ? {
+              'highlight-red': convertToNumber(row['Средний Балл']) < 3
+            }
+          : 'rowColor'
+      "
+      class="row"
+      appDragging
+    >
+      <!-- <tr
     *ngFor="let row of bufferRows"
     [ngClass]="
       isHighlight
@@ -61,25 +91,42 @@
           }
         : 'rowColor'
     "
-  >
-    <td *ngFor="let column of headers" class="cell">
-      {{ row[column] }}
-      <button
-        class="editBtn"
-        *ngIf="column === 'Средний Балл'"
-        (click)="popupEdit.toggleModule('edit', row)"
-      >
-        <img src="../assets/edit-solid.svg" />
-      </button>
-      <button
-        class="deleteBtn"
-        *ngIf="column === 'Средний Балл'"
-        (click)="popupDelete.toggleModule('delete', row)"
-      >
-        <img src="../assets/times-solid.svg" />
-      </button>
-    </td>
-  </tr>
+  > -->
+      <td *ngFor="let column of headers" class="cell">
+        {{
+          column === "Средний Балл" && isEnable
+            ? (row[column] | convertOneToTen)
+            : row[column]
+        }}
+        <button
+          class="icon-button editBtn"
+          *ngIf="column === 'Средний Балл'"
+          (click)="popupEdit.toggleModule('edit', row)"
+        >
+          <img src="../assets/edit-solid.svg" />
+        </button>
+        <button
+          class="icon-button deleteBtn"
+          *ngIf="column === 'Средний Балл'"
+          (click)="popupDelete.toggleModule('delete', row)"
+        >
+          <img src="../assets/times-solid.svg" />
+        </button>
+        <div
+          *ngIf="column === 'Средний Балл'"
+          class="example-handle"
+          appFreeDraggingHandle
+        >
+          <svg width="24px" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"
+            ></path>
+            <path d="M0 0h24v24H0z" fill="none"></path>
+          </svg>
+        </div>
+      </td>
+    </tr>
+  </tbody>
 </table>
 
 <div class="group-buttons">
@@ -93,7 +140,23 @@
   <button class="primaryBtn" (click)="highlightController()">
     Отключить подсветку
   </button>
+  <button class="primaryBtn" (click)="onCalculate()">
+    Посчитать успеваемость группы
+  </button>
 </div>
+
+<div class="display-average-score" *ngIf="isActivateCalculate">
+  <span>Показатель успеваемости группы:</span>
+  <span class="score-value">{{
+    bufferRows | getValuesByKey: "Средний Балл" | calculateAverage
+  }}</span>
+</div>
+
+<div
+  [appDropZone]="dropZone"
+  (onDroppableComplete)="onZoneDrop($event)"
+  class="drop-zone"
+></div>
 
 <app-popup #popupDelete (emitDelete)="delete($event)"></app-popup>
 <app-popup

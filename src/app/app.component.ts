@@ -1,8 +1,9 @@
-import { Component, Input } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ["./app.component.css"]
 })
 
@@ -38,6 +39,18 @@ export class AppComponent {
       "Средний Балл": "4"
     },
   ];
+  curators: Array<{ [key: string]: string }> = [
+    {
+      "Фамилия": "Петров",
+      "Имя": "Сергей",
+      "Отчество": "Николаевич"
+    },
+    {
+      "Фамилия": "Бунин",
+      "Имя": "Алексей",
+      "Отчество": "Кириллович"
+    },
+  ];
   bufferRows: Array<{ [key: string]: string }> = this.rows;
   rows2: Array<{ [key: string]: string }> = this.rows;
   rows3: Array<{ [key: string]: string }> = this.rows;
@@ -67,9 +80,37 @@ export class AppComponent {
     "Дата Рождения": this.isDownDateBirth,
     "Средний Бал": this.isDownScore
   };
+
   isHighlight: boolean = true;
   isEnable: boolean = false;
   isActivateCalculate: boolean = false;
+  isGrouping: boolean = false;
+
+  groupedRows: { [key: string]: Array<{ [key: string]: string }> } = {};
+  draggableObjects: Array<{ data: { [key: string]: string }, zones: Array<{ [key: string]: string }> }> = new Array(this.rows.length);
+  droppableObjects: Array<{ data: { [key: string]: string }, zone: string }> = new Array(this.curators.length);
+
+  constructor() {
+    for (let i = 0; i < this.droppableObjects.length; i++) {
+      this.droppableObjects[i] = {
+        data: this.curators[i],
+        zone: "zone-" + i
+      };
+    }
+
+    // const zones = this.droppableObjects.map((object) => object.zone);
+    // console.log(zones);
+    // console.log(this.droppableObjects);
+
+    // for (let i = 0; i < this.rows.length; i++) {
+    //   this.draggableObjects.push({
+    //     data: this.rows[i],
+    //     zones: zones
+    //   });
+    // }
+
+    // console.log(this.draggableObjects);
+  }
 
   convertToNumber(val: string): number {
     return parseInt(val, 10);
@@ -187,7 +228,7 @@ export class AppComponent {
     this.rows3 = filteredRows;
   }
 
-  highlightController(): void {
+  onHighlight(): void {
     this.isHighlight = !this.isHighlight;
   }
 
@@ -203,5 +244,17 @@ export class AppComponent {
 
   add(row: { [key: string]: string }): void {
     this.bufferRows.push(row);
+  }
+
+  onGroup(): void {
+    this.isGrouping = !this.isGrouping;
+  }
+
+  onZoneDrop(acceptedData: { data: { [key: string]: string }, zone: string }): void {
+    const zone: string = acceptedData.zone;
+
+    const students: Array<{ [key: string]: string }> = this.groupedRows[zone];
+
+    this.groupedRows[zone] = students ? [...students, acceptedData.data] : [acceptedData.data];
   }
 }

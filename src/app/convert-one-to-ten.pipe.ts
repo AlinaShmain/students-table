@@ -1,7 +1,7 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform } from "@angular/core";
 
 @Pipe({
-  name: 'convertOneToTen'
+  name: "convertOneToTen"
 })
 export class ConvertOneToTenPipe implements PipeTransform {
   oneToFiveScale = 5;

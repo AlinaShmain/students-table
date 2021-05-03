@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChange, SimpleChanges } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 
 @Component({
   selector: "app-component-filter",
   templateUrl: "./component-filter.component.html",
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ["./component-filter.component.css"]
 })
 

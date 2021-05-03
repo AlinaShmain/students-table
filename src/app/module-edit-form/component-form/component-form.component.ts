@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
 
 interface AllValidationControlErrors {
@@ -14,6 +14,7 @@ interface AllValidationFormGroupErrors {
 @Component({
   selector: "app-component-form",
   templateUrl: "./component-form.component.html",
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ["./component-form.component.css"]
 })
 export class ComponentFormComponent implements OnInit {

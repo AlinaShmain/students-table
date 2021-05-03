@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from "@angular/core";
 
 @Component({
   selector: "app-popup",
   templateUrl: "./component-popup.component.html",
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ["./component-popup.component.css"]
 })
 export class PopupComponent implements OnInit {
@@ -21,7 +22,12 @@ export class PopupComponent implements OnInit {
   isOpenCreateContent: boolean = false;
   isOpenDeleteContent: boolean = false;
 
+  constructor(private cdr: ChangeDetectorRef) {
+
+  }
+
   ngOnInit(): void {
+    console.log("popup");
   }
 
   toggleModule(nameBtn: string, row?: { [key: string]: string }): void {
@@ -36,6 +42,8 @@ export class PopupComponent implements OnInit {
     } else if (nameBtn === "delete") {
       this.isOpenDeleteContent = true;
     }
+    this.cdr.markForCheck();
+    // this.cdr.markForCheck();
   }
 
   closeModule(): void {

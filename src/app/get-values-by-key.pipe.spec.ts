@@ -1,7 +1,7 @@
-import { GetValuesByKeyPipe } from './get-values-by-key.pipe';
+import { GetValuesByKeyPipe } from "./get-values-by-key.pipe";
 
-describe('GetValuesByKeyPipe', () => {
-  it('create an instance', () => {
+describe("GetValuesByKeyPipe", () => {
+  it("create an instance", () => {
     const pipe = new GetValuesByKeyPipe();
     expect(pipe).toBeTruthy();
   });

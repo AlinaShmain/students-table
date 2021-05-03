@@ -1,7 +1,7 @@
-import { CalculateAveragePipe } from './calculate-average.pipe';
+import { CalculateAveragePipe } from "./calculate-average.pipe";
 
-describe('CalculateAveragePipe', () => {
-  it('create an instance', () => {
+describe("CalculateAveragePipe", () => {
+  it("create an instance", () => {
     const pipe = new CalculateAveragePipe();
     expect(pipe).toBeTruthy();
   });

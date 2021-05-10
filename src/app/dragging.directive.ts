@@ -1,13 +1,14 @@
 import { Directive, HostListener, Input } from "@angular/core";
+import { Student } from "./services/student";
 
 @Directive({
   selector: "[appDragging]"
 })
 export class DraggingDirective {
-  private elementContent: { [key: string]: string } | undefined;
+  private elementContent: Student | undefined;
 
   @Input()
-  set appDragging(content: { [key: string]: string }) {
+  set appDragging(content: Student) {
     this.elementContent = content;
   }
 

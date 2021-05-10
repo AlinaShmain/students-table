@@ -1,0 +1,151 @@
+<table id="students">
+  <thead>
+    <tr>
+      <th *ngFor="let column of headers | getValues">
+        {{ column }}
+        <div class="header-buttons" *ngIf="column !== '№'">
+          <button
+            (click)="onToggleDown(column)"
+            class="icon-button drop-button"
+          >
+            <img
+              src="../assets/arrow-down.svg"
+              [class]="{ 'arrow-up': downFlags[column] }"
+            />
+          </button>
+          <button
+            class="icon-button open-search-button"
+            (click)="onOpenInput($event, column)"
+            appToggleIcon
+            img-src-1="../assets/loupe.svg"
+            img-src-2="../assets/times-solid.svg"
+          ></button>
+        </div>
+        <input
+          *ngIf="
+            column !== 'Средний Балл' &&
+            column !== 'Дата Рождения' &&
+            openFlags[column]
+          "
+          placeholder="Search..."
+          type="text"
+          class="search-input"
+          #inputSearch
+          (keyup)="onKey(inputSearch.value, column)"
+        />
+        <app-component-filter
+          *ngIf="
+            (column === 'Дата Рождения' || column === 'Средний Балл') &&
+            openFlags[column]
+          "
+          [students]="students"
+          [students2]="students2"
+          [students3]="students3"
+          [column]="column"
+          (emitSetStudents)="setStudents($event)"
+          (emitSetStudents2)="setStudents2($event)"
+          (emitSetStudents3)="setStudents3($event)"
+        >
+        </app-component-filter>
+        <div *ngIf="column === 'Средний Балл'" class="toggle-score-scale">
+          Включить десятибальную систему
+          <button
+            class="icon-button toggle-scale-button"
+            (click)="onToggleScale()"
+            appToggleIcon
+            img-src-1="../assets/toggle.svg"
+            img-src-2="../assets/enable.svg"
+          ></button>
+        </div>
+      </th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr
+      *ngFor="let student of bufferStudents"
+      [ngClass]="
+        isHighlight
+          ? {
+              'highlight-red': convertToNumber(student.averageScore) < 3,
+              'highlight-blueviolet': foundStudents.includes(student)
+            }
+          : 'rowColor'
+      "
+      class="row"
+      draggable="true"
+      [appDragging]="student"
+    >
+      <td *ngFor="let column of headers | getKeys" class="cell">
+        {{
+          headers[column] === "Средний Балл" && isEnable
+            ? (student[column] | convertOneToTen)
+            : student[column]
+        }}
+        <button
+          class="icon-button editBtn"
+          *ngIf="headers[column] === 'Средний Балл'"
+          (click)="onEdit($event, student)"
+          routerLink="form/edit"
+        >
+          <img src="../assets/edit-solid.svg" />
+        </button>
+        <button
+          class="icon-button deleteBtn"
+          *ngIf="headers[column] === 'Средний Балл'"
+          (click)="onDelete($event, student)"
+          routerLink="delete"
+        >
+          <img src="../assets/times-solid.svg" />
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="group-buttons">
+  <button class="primaryBtn createBtn" routerLink="form/create">
+    Добавить студента
+    <img src="../assets/plus-solid.svg" />
+  </button>
+  <button class="primaryBtn" (click)="onHighlight()">
+    Отключить подсветку
+  </button>
+  <button class="primaryBtn" (click)="onCalculate()">
+    Посчитать успеваемость группы
+  </button>
+  <button class="primaryBtn" (click)="onGroup()">
+    Распределить по кураторам
+  </button>
+</div>
+
+<div class="display-average-score" *ngIf="isActivateCalculate">
+  <span>Показатель успеваемости группы:</span>
+  <span class="score-value">{{ bufferStudents | getScores | calculateAverage }}</span>
+</div>
+
+<div class="drop-zones-container" *ngIf="isGrouping">
+  <div
+    class="drop-zone"
+    *ngFor="let dropZone of droppableObjects"
+    [appDropZone]="dropZone"
+    (onDroppableComplete)="onZoneDrop($event)"
+  >
+    <div class="courator-container">
+      Куратор:
+      <span *ngFor="let key of dropZone.data | getKeys">
+        {{ dropZone.data[key] }}
+      </span>
+    </div>
+    <span class="drag-info" *ngIf="!groupedRows[dropZone.zone]"
+      >Потяните строку с данными ученика чтобы добавить его куратору</span
+    >
+    <table class="courators-table">
+      <tr *ngFor="let group of groupedRows[dropZone.zone]">
+        <td *ngFor="let column of group | getKeys">{{ headers[column] !== "№" ? group[column] : '' }}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<router-outlet></router-outlet>

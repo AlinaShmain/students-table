@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges } from "@angular/core";
+import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
+import { Student } from "../services/student";
+import { StudentsService } from "../services/students.service";
+import {Location} from '@angular/common';
 
 @Component({
   selector: "app-popup",
@@ -6,70 +12,62 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ["./component-popup.component.css"]
 })
-export class PopupComponent implements OnInit {
-  @Output()
-  emitDelete: EventEmitter<{ [key: string]: string }> = new EventEmitter<{ [key: string]: string }>();
-  @Output()
-  emitEditRow: EventEmitter<{ currentRow: { [key: string]: string } | undefined, editedRow: { [key: string]: string } | undefined }> =
-    new EventEmitter<{ currentRow: { [key: string]: string } | undefined, editedRow: { [key: string]: string } | undefined }>();
-  @Output()
-  emitAddRow: EventEmitter<{ [key: string]: string }> = new EventEmitter<{ [key: string]: string }>();
-
-  isOpen: boolean = false;
-  tableRow: { [key: string]: string } | undefined;
-
-  isOpenEditContent: boolean = false;
-  isOpenCreateContent: boolean = false;
+export class PopupComponent implements OnInit, OnDestroy {
   isOpenDeleteContent: boolean = false;
 
-  constructor(private cdr: ChangeDetectorRef) {
+  private destroy$ = new Subject<void>();
 
+  private history: string[] = [];
+
+  constructor(private activeRoute: ActivatedRoute, private router: Router, private studentsService: StudentsService, private location: Location) {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.history.push(event.urlAfterRedirects)
+      }
+    })
   }
 
   ngOnInit(): void {
     console.log("popup");
+    const path = this.activeRoute.snapshot.url[0].path;
+    // console.log("path", path);
+    this.isOpenDeleteContent = path === "delete";
   }
 
-  toggleModule(nameBtn: string, row?: { [key: string]: string }): void {
-    this.isOpen = !this.isOpen;
-    if (row) {
-      this.tableRow = row;
+  ngOnDestroy(): void {
+    console.log("unsubsrcibe in popup component");
+    this.isOpenDeleteContent = false;
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  goBack(): void {
+    this.history.pop();
+    if (this.history.length > 0) {
+      this.location.back();
+    } else {
+      this.router.navigateByUrl('/');
     }
-    if (nameBtn === "edit") {
-      this.isOpenEditContent = true;
-    } else if (nameBtn === "create") {
-      this.isOpenCreateContent = true;
-    } else if (nameBtn === "delete") {
-      this.isOpenDeleteContent = true;
-    }
-    this.cdr.markForCheck();
-    // this.cdr.markForCheck();
   }
 
   closeModule(): void {
-    this.isOpen = !this.isOpen;
-    this.isOpenCreateContent = false;
-    this.isOpenEditContent = false;
+    this.isOpenDeleteContent = false;
+    // this.router.navigateByUrl("/");
+    this.goBack();
   }
 
-  delete(): void {
-    console.log("delete");
-    this.emitDelete.emit(this.tableRow);
-    this.closeModule();
+  onConfirm() {
+    let studentToDelete: Student | undefined = this.studentsService.getStudentToEdit();
+
+    if (studentToDelete) {
+      this.studentsService.deleteStudent(studentToDelete).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(({ id }) => {
+        console.log("after delete", id);
+        // this.router.navigateByUrl("/");
+        this.goBack();
+      });
+    }
   }
 
-  edit(data: { currentRow: { [key: string]: string } | undefined, editedRow: { [key: string]: string } | undefined }): void {
-    console.log("edit");
-    // console.log(data.editedRow);
-    // console.log(data.currentRow);
-    this.emitEditRow.emit(data);
-    this.closeModule();
-  }
-
-  add(row: { [key: string]: string }): void {
-    // console.log("add popup");
-    // console.log(row);
-    this.emitAddRow.emit(row);
-    this.closeModule();
-  }
 }

@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Student } from "../services/student";
 
 @Component({
   selector: "app-component-filter",
@@ -43,44 +44,45 @@ export class ComponentFilterComponent implements OnInit {
     return this._column || "Unknown";
   }
 
-  _rows: Array<{ [key: string]: string }> = [];
+  private _students: Student[] = [];
 
-  @Input() set rows(value: Array<{ [key: string]: string }>) {
-    this._rows = value;
+  @Input() set students(value: Student[]) {
+    this._students = value;
   }
 
-  get rows(): Array<{ [key: string]: string }> {
-    return this._rows || "Unknown";
+  get students(): Student[] {
+    return this._students;
   }
 
-  _rows2: Array<{ [key: string]: string }> = [];
+  private _students2: Student[] = [];
 
-  @Input() set rows2(value: Array<{ [key: string]: string }>) {
-    this._rows2 = value;
+  @Input() set students2(value: Student[]) {
+    this._students2 = value;
   }
 
-  get rows2(): Array<{ [key: string]: string }> {
-    return this._rows2 || "Unknown";
+  get students2(): Student[] {
+    return this._students2;
   }
 
-  _rows3: Array<{ [key: string]: string }> = [];
+  private _students3: Student[] = [];
 
-  @Input() set rows3(value: Array<{ [key: string]: string }>) {
-    this._rows3 = value;
+  @Input() set students3(value: Student[]) {
+    this._students3 = value;
   }
 
-  get rows3(): Array<{ [key: string]: string }> {
-    return this._rows3 || "Unknown";
+  get students3(): Student[] {
+    return this._students3;
   }
 
   @Output()
-  emitSetRows: EventEmitter<Array<{ [key: string]: string }>> = new EventEmitter<Array<{ [key: string]: string }>>();
+  emitSetStudents: EventEmitter<Student[]> = new EventEmitter<Student[]>();
   @Output()
-  emitSetRows2: EventEmitter<Array<{ [key: string]: string }>> = new EventEmitter<Array<{ [key: string]: string }>>();
+  emitSetStudents2: EventEmitter<Student[]> = new EventEmitter<Student[]>();
   @Output()
-  emitSetRows3: EventEmitter<Array<{ [key: string]: string }>> = new EventEmitter<Array<{ [key: string]: string }>>();
+  emitSetStudents3: EventEmitter<Student[]> = new EventEmitter<Student[]>();
 
   ngOnInit(): void {
+    
   }
 
   getDay(date: string): number {
@@ -92,25 +94,22 @@ export class ComponentFilterComponent implements OnInit {
   }
 
   getYear(date: string): number {
-    // const yearVal = date.split(".")[2];
-    // const yearNum = Number(yearVal);
-    // const fullYear = (yearNum < 100) ? "19" + yearVal : "20" + yearVal;
     return Number(date.split(".")[2]);
   }
 
   onFilterDate(): void {
-    let filteredRows = this.rows2;
+    let filteredStudents = [...this.students2];
 
     if (this.selectedFromDay !== "From" || this.selectedToDay !== "To") {
       const valFrom: number = Number(this.selectedFromDay);
       const valTo: number = Number(this.selectedToDay);
 
       if (this.selectedFromDay !== "From" && this.selectedToDay !== "To") {
-        filteredRows = filteredRows.filter((row) => (this.getDay(row["Дата Рождения"]) >= valFrom) && (this.getDay(row["Дата Рождения"]) <= valTo));
+        filteredStudents = filteredStudents.filter((student) => (this.getDay(student.dateBirth) >= valFrom) && (this.getDay(student.dateBirth) <= valTo));
       } else if (this.selectedFromDay !== "From") {
-        filteredRows = filteredRows.filter((row) => (this.getDay(row["Дата Рождения"]) >= valFrom));
+        filteredStudents = filteredStudents.filter((student) => (this.getDay(student.dateBirth) >= valFrom));
       } else {
-        filteredRows = filteredRows.filter((row) => (this.getDay(row["Дата Рождения"]) <= valTo));
+        filteredStudents = filteredStudents.filter((student) => (this.getDay(student.dateBirth) <= valTo));
       }
     }
     if (this.selectedFromMonth !== "From" || this.selectedToMonth !== "To") {
@@ -118,11 +117,11 @@ export class ComponentFilterComponent implements OnInit {
       const valTo: number = this.months[this.selectedToMonth];
 
       if (this.selectedFromMonth !== "From" && this.selectedToMonth !== "To") {
-        filteredRows = filteredRows.filter((row) => (this.getMonth(row["Дата Рождения"]) >= valFrom) && (this.getMonth(row["Дата Рождения"]) <= valTo));
+        filteredStudents = filteredStudents.filter((student) => (this.getMonth(student.dateBirth) >= valFrom) && (this.getMonth(student.dateBirth) <= valTo));
       } else if (this.selectedFromMonth !== "From") {
-        filteredRows = filteredRows.filter((row) => (this.getMonth(row["Дата Рождения"]) >= valFrom));
+        filteredStudents = filteredStudents.filter((student) => (this.getMonth(student.dateBirth) >= valFrom));
       } else {
-        filteredRows = filteredRows.filter((row) => (this.getMonth(row["Дата Рождения"]) <= valTo));
+        filteredStudents = filteredStudents.filter((student) => (this.getMonth(student.dateBirth) <= valTo));
       }
     }
     if (this.selectedFromYear !== "From" || this.selectedToYear !== "To") {
@@ -130,19 +129,19 @@ export class ComponentFilterComponent implements OnInit {
       const valTo: number = Number(this.selectedToYear);
 
       if (this.selectedFromYear !== "From" && this.selectedToYear !== "To") {
-        filteredRows = filteredRows.filter((row) => (this.getYear(row["Дата Рождения"]) >= valFrom) && (this.getYear(row["Дата Рождения"]) <= valTo));
+        filteredStudents = filteredStudents.filter((student) => (this.getYear(student.dateBirth) >= valFrom) && (this.getYear(student.dateBirth) <= valTo));
       } else if (this.selectedFromYear !== "From") {
-        filteredRows = filteredRows.filter((row) => (this.getYear(row["Дата Рождения"]) >= valFrom));
+        filteredStudents = filteredStudents.filter((student) => (this.getYear(student.dateBirth) >= valFrom));
       } else {
-        filteredRows = filteredRows.filter((row) => (this.getYear(row["Дата Рождения"]) <= valTo));
+        filteredStudents = filteredStudents.filter((student) => (this.getYear(student.dateBirth) <= valTo));
       }
     }
     if (this.selectedFromScore !== "From" || this.selectedToScore !== "To") {
-      this.emitSetRows3.emit(this.rows2);
-      console.log(this.rows3);
+      this.emitSetStudents3.emit(this.students2);
+      console.log(this.students3);
     }
-    this.emitSetRows2.emit(filteredRows);
-    this.emitSetRows.emit(filteredRows);
+    this.emitSetStudents2.emit(filteredStudents);
+    this.emitSetStudents.emit(filteredStudents);
   }
 
   onResetFilter(): void {
@@ -179,32 +178,33 @@ export class ComponentFilterComponent implements OnInit {
       localStorage.removeItem("selectedToScore");
     }
     // localStorage.clear();
-    this.emitSetRows2.emit(this.rows);
-    this.emitSetRows.emit(this.rows3);
+    this.emitSetStudents2.emit(this.students);
+    this.emitSetStudents.emit(this.students3);
   }
 
   onFilterScore(): void {
-    let filteredRows = this.rows2;
+    let filteredStudents = this.students2;
+    console.log(filteredStudents);
 
     if (this.selectedFromScore !== "From" || this.selectedToScore !== "To") {
       const valFrom: number = Number(this.selectedFromScore);
       const valTo: number = Number(this.selectedToScore);
 
       if (this.selectedFromScore !== "From" && this.selectedToScore !== "To") {
-        filteredRows = filteredRows.filter((row) => (Number(row["Средний Балл"]) >= valFrom) && (Number(row["Средний Балл"]) <= valTo));
+        filteredStudents = filteredStudents.filter((student) => (Number(student.averageScore) >= valFrom) && (Number(student.averageScore) <= valTo));
       } else if (this.selectedFromScore !== "From") {
-        filteredRows = filteredRows.filter((row) => (Number(row["Средний Балл"]) >= valFrom));
+        filteredStudents = filteredStudents.filter((student) => (Number(student.averageScore) >= valFrom));
       } else {
-        filteredRows = filteredRows.filter((row) => (Number(row["Средний Балл"]) <= valTo));
+        filteredStudents = filteredStudents.filter((student) => (Number(student.averageScore) <= valTo));
       }
     }
     if (this.selectedFromDay !== "From" || this.selectedToDay !== "To" || this.selectedFromMonth !== "From" || this.selectedToMonth !== "To" || this.selectedFromYear !== "From" || this.selectedToYear !== "To") {
       // console.log(this.rows2);
       // this.rows3 = this.rows2;
-      this.emitSetRows3.emit(this.rows2);
+      this.emitSetStudents3.emit(this.students2);
     }
-    this.emitSetRows2.emit(filteredRows);
-    this.emitSetRows.emit(filteredRows);
+    this.emitSetStudents2.emit(filteredStudents);
+    this.emitSetStudents.emit(filteredStudents);
   }
 
   saveDateContext(): void {

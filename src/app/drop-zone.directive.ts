@@ -1,4 +1,5 @@
 import { Directive, EventEmitter, HostBinding, HostListener, Input, Output } from "@angular/core";
+import { Student } from "./services/student";
 
 @Directive({
   selector: "[appDropZone]"
@@ -18,7 +19,7 @@ export class DropZoneDirective {
   }
 
   @Output()
-  onDroppableComplete: EventEmitter<DroppableOptions> = new EventEmitter<DroppableOptions>();
+  onDroppableComplete: EventEmitter<{ data: Student, zone: string }> = new EventEmitter<{ data: Student, zone: string }>();
 
   @HostListener("drop", ["$event"])
   onDrop(event: DragEvent): void {

@@ -1,5 +1,11 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from "@angular/core";
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
+import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
+import { takeUntil } from "rxjs/operators";
+import { Subject } from "rxjs";
+import { Student } from "src/app/services/student";
+import { StudentsService } from "src/app/services/students.service";
+import { Location } from '@angular/common';
 
 interface AllValidationControlErrors {
   controlName: string;
@@ -17,7 +23,7 @@ interface AllValidationFormGroupErrors {
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ["./component-form.component.css"]
 })
-export class ComponentFormComponent implements OnInit {
+export class ComponentFormComponent implements OnInit, OnDestroy {
   name: { firstName: string, lastName: string, middleName: string };
   studentName: FormGroup;
   dateBirthStr: string;
@@ -43,21 +49,18 @@ export class ComponentFormComponent implements OnInit {
 
   get middleName(): AbstractControl | null { return this.studentName.get("middleName"); }
 
-  @Input()
   isOpenCreateContent: boolean = false;
-  @Input()
   isOpenEditContent: boolean = false;
 
-  @Input()
-  rowToEdit: { [key: string]: string } | undefined;
+  studentToEdit: Student | undefined;
 
-  @Output()
-  emitEditRow: EventEmitter<{ currentRow: { [key: string]: string } | undefined, editedRow: { [key: string]: string } | undefined }> =
-    new EventEmitter<{ currentRow: { [key: string]: string } | undefined, editedRow: { [key: string]: string } | undefined }>();
-  @Output()
-  emitAddRow: EventEmitter<{ [key: string]: string }> = new EventEmitter<{ [key: string]: string }>();
+  students: Student[] = [];
 
-  constructor(private _fb: FormBuilder) {
+  private destroy$ = new Subject<void>();
+
+  private history: string[] = [];
+
+  constructor(private _fb: FormBuilder, private activeRoute: ActivatedRoute, private router: Router, private studentsService: StudentsService, private cdr: ChangeDetectorRef, private location: Location) {
     this.name = {
       firstName: "",
       lastName: "",
@@ -83,6 +86,21 @@ export class ComponentFormComponent implements OnInit {
 
     this.errors = [];
     this.errorsFormGroup = [];
+
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.history.push(event.urlAfterRedirects)
+      }
+    })
+  }
+
+  goBack(): void {
+    this.history.pop();
+    if (this.history.length > 0) {
+      this.location.back();
+    } else {
+      this.router.navigateByUrl('/');
+    }
   }
 
   getMaxDate(): Date {
@@ -100,19 +118,31 @@ export class ComponentFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.isOpenEditContent && this.rowToEdit) {
-      const _lastName = this.rowToEdit["Фамилия"];
-      const _firstName = this.rowToEdit["Имя"];
-      const _middleName = this.rowToEdit["Отчество"];
-      let _dateBirth = this.rowToEdit["Дата Рождения"];
-      _dateBirth = _dateBirth.replace(/(\d{2}).(\d{2}).(\d{4})/, "$3-$2-$1");
-      const _averageScore = this.rowToEdit["Средний Балл"];
+    const path = this.activeRoute.snapshot.url[0].path;
+    // console.log("path", path);
+    this.isOpenCreateContent = path === "create";
+    this.isOpenEditContent = path === "edit";
 
-      this.lastName && this.lastName.setValue(_lastName);
-      this.firstName && this.firstName.setValue(_firstName);
-      this.middleName && this.middleName.setValue(_middleName);
-      this.dateBirth && this.dateBirth.setValue(_dateBirth);
-      this.averageScore && this.averageScore.setValue(_averageScore);
+    const sub = this.studentsService.getStudents().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((students: Student[]) => {
+      console.log("update in students", students);
+      this.students = students;
+      this.cdr.markForCheck();
+    });
+
+    this.studentToEdit = this.studentsService.getStudentToEdit();
+    console.log("get student to edit", this.studentToEdit);
+
+    if (this.isOpenEditContent && this.studentToEdit) {
+      let { lastName, firstName, middleName, dateBirth, averageScore } = this.studentToEdit;
+      dateBirth = dateBirth.replace(/(\d{2}).(\d{2}).(\d{4})/, "$3-$2-$1");
+
+      this.lastName && this.lastName.setValue(lastName);
+      this.firstName && this.firstName.setValue(firstName);
+      this.middleName && this.middleName.setValue(middleName);
+      this.dateBirth && this.dateBirth.setValue(dateBirth);
+      this.averageScore && this.averageScore.setValue(averageScore);
     }
 
     this.formModel.valueChanges.subscribe(() => {
@@ -122,6 +152,12 @@ export class ComponentFormComponent implements OnInit {
     });
 
     this.calculateErrors(this.formModel);
+  }
+
+  ngOnDestroy(): void {
+    console.log("unsubscribe in form component");
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   comparisonValidator(ctrl: AbstractControl): ValidationErrors | null {
@@ -252,6 +288,28 @@ export class ComponentFormComponent implements OnInit {
     }
   }
 
+  addNewStudent(student: Student): void {
+    this.studentsService.addStudent(student).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((student: Student) => {
+      console.log("after post", student);
+      this.students.push(student);
+      // this.router.navigateByUrl("/");
+      this.goBack();
+    });
+  }
+
+  editStudent(studentToEdit: Student): void {
+    this.studentsService.editStudent(studentToEdit).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((editedStudent: Student) => {
+      console.log("after put", editedStudent);
+      this.students.splice(this.students.findIndex((student) => student.id === editedStudent.id), 1, editedStudent);
+      // this.router.navigateByUrl("/");
+      this.goBack();
+    });
+  }
+
   onSubmit(): void {
     this.submitted = true;
 
@@ -260,22 +318,29 @@ export class ComponentFormComponent implements OnInit {
       const date = this.dateBirth.value;
       const dateStr = date.toString().replace(/(\d{4})-(\d{2})-(\d{2})/, "$3.$2.$1");
       const score = this.averageScore.value;
-      const newRow = {
-        "Фамилия": lastName,
-        "Имя": firstName,
-        "Отчество": middleName,
-        "Дата Рождения": dateStr,
-        "Средний Балл": score
-      };
+      let studentToEdit: Student | undefined = this.studentsService.getStudentToEdit();
+      let id: string = "0";
+      if (studentToEdit) {
+        id = studentToEdit.id;
+      }
       if (this.isOpenCreateContent) {
-        // console.log("add");
-        this.emitAddRow.emit(newRow);
+        id = this.students.length.toString();
+      }
+      const student = {
+        id: id,
+        lastName: lastName,
+        firstName: firstName,
+        middleName: middleName,
+        dateBirth: dateStr,
+        averageScore: score
+      };
+      console.log("on submit form", student);
+      if (this.isOpenCreateContent) {
+        console.log("add");
+        this.addNewStudent(student);
       } else if (this.isOpenEditContent) {
-        // console.log("edit");
-        this.emitEditRow.emit({
-          currentRow: this.rowToEdit,
-          editedRow: newRow
-        });
+        console.log("edit");
+        this.editStudent(student);
       }
     }
   }

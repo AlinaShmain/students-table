@@ -1,7 +1,7 @@
-import { GetScoresPipe } from './get-scores.pipe';
+import { GetScoresPipe } from "./get-scores.pipe";
 
-describe('GetScoresPipe', () => {
-  it('create an instance', () => {
+describe("GetScoresPipe", () => {
+  it("create an instance", () => {
     const pipe = new GetScoresPipe();
     expect(pipe).toBeTruthy();
   });

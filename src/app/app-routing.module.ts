@@ -19,15 +19,15 @@ const routes: Routes = [
           { path: "create", component: ComponentFormComponent },
           { path: "edit", component: ComponentFormComponent, canActivate: [EditGuard] },
         ]
-      }, 
+      },
       {
         path: "delete",
         component: PopupComponent
-      }
+      },
     ]
   },
-  { path: 'page-not-found', component: PageNotFoundComponent },
-  { path: '**', redirectTo: '/page-not-found' },
+  { path: "page-not-found", component: PageNotFoundComponent },
+  { path: "**", redirectTo: "/page-not-found" },
 ];
 
 @NgModule({

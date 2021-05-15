@@ -1,10 +1,10 @@
-import { Injectable } from '@angular/core';
-import { StudentsService } from './students.service';
+import { Injectable } from "@angular/core";
+import { Observable, Subscriber } from "rxjs";
 import { Student } from "./student";
-import { Observable, Subject, Subscriber } from 'rxjs';
+import { StudentsService } from "./students.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class StudentsLocalService extends StudentsService {
   // private _headers: Array<string> = ["Фамилия", "Имя", "Отчество", "Дата Рождения", "Средний Балл"];
@@ -43,9 +43,9 @@ export class StudentsLocalService extends StudentsService {
     },
   ];
 
-  constructor() {
-    super();
-  }
+  // constructor(store$: Store<AppState>) {
+  //   super(store$);
+  // }
 
   getStudents(): Observable<Student[]> {
     console.log("get students from local service");
@@ -53,8 +53,6 @@ export class StudentsLocalService extends StudentsService {
     return new Observable((subscriber: Subscriber<Student[]>) => {
       console.log("Subscriber Subscribed to get");
       subscriber.next(this._students);
-      this.students = [...this._students];
-      this.setBufferStudents(this._students);
     });
   }
 
@@ -65,7 +63,6 @@ export class StudentsLocalService extends StudentsService {
     return new Observable((subscriber: Subscriber<Student>) => {
       console.log("Subscriber Subscribed to add");
       subscriber.next(student);
-      this.setBufferStudents(this.students);
     });
   }
 
@@ -76,18 +73,16 @@ export class StudentsLocalService extends StudentsService {
     return new Observable((subscriber: Subscriber<Student>) => {
       console.log("Subscriber Subscribed to edit");
       subscriber.next(studentToEdit);
-      this.setBufferStudents(this.students);
     });
   }
 
-  deleteStudent(studentToDelete: Student): Observable<{id: string}> {
+  deleteStudent(studentToDelete: Student): Observable<{ id: string }> {
     this._students.splice(this._students.findIndex((student) => student.id === studentToDelete.id), 1);
     this.students = [...this._students];
 
-    return new Observable((subscriber: Subscriber<{id: string}>) => {
+    return new Observable((subscriber: Subscriber<{ id: string }>) => {
       console.log("Subscriber Subscribed to delete");
-      subscriber.next({id: studentToDelete.id});
-      this.setBufferStudents(this.students);
+      subscriber.next({ id: studentToDelete.id });
     });
   }
 

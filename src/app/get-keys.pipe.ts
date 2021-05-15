@@ -6,7 +6,7 @@ import { Student } from "./services/student";
 })
 export class GetKeysPipe implements PipeTransform {
 
-  transform(values: Student | {[key: string]: string}): Array<keyof typeof values>{
+  transform(values: Student | { [key: string]: string }): Array<keyof typeof values> {
     return Object.keys(values) as Array<keyof typeof values>;
   }
 

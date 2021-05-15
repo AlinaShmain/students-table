@@ -1,8 +1,10 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from "@angular/core";
+import { Store } from "@ngrx/store";
 import { Observable, Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
-import { StudentsService } from "src/app/services/students.service";
+import { StudentsPageActions } from "src/app/store/actions";
 import { Student } from "../services/student";
+import { AppState, selectBufferStudents, selectStudents } from "../store/state/app.state";
 
 @Component({
   selector: "app-home",
@@ -11,8 +13,7 @@ import { Student } from "../services/student";
   styleUrls: ["./home.component.css"]
 })
 
-export class HomeComponent {
-  // headers: Array<string> = ["Фамилия", "Имя", "Отчество", "Дата Рождения", "Средний Балл"];
+export class HomeComponent implements OnInit, OnDestroy {
   headers: Student = {
     id: "№",
     lastName: "Фамилия",
@@ -21,7 +22,7 @@ export class HomeComponent {
     dateBirth: "Дата Рождения",
     averageScore: "Средний Балл"
   };
-  students: Student[] = [];
+  students$: Observable<Student[]> = this.store.select(selectStudents);
   curators: Array<{ [key: string]: string }> = [
     {
       "Фамилия": "Петров",
@@ -35,8 +36,8 @@ export class HomeComponent {
     },
   ];
   bufferStudents: Student[] = [];
-  students2: Student[] = [];
-  students3: Student[] = [];
+  students2: Student[] | null = [];
+  students3: Student[] | null = [];
   isShowLastName: boolean = false;
   isShowFirstName: boolean = false;
   isShowMiddleName: boolean = false;
@@ -50,7 +51,6 @@ export class HomeComponent {
     "Средний Бал": this.isShowScore
   };
   foundStudents: Student[] = [];
-  // isDown: boolean = true;
   isDownLastName: boolean = false;
   isDownFirstName: boolean = false;
   isDownMiddleName: boolean = false;
@@ -71,11 +71,11 @@ export class HomeComponent {
 
   groupedRows: { [key: string]: Student[] } = {};
   // draggableObjects: Array<{ data: { [key: string]: string }, zones: Array<{ [key: string]: string }> }> = new Array(this.rows.length);
-  droppableObjects: { data: {[key: string]: string}, zone: string }[] = new Array(this.curators.length);
+  droppableObjects: { data: { [key: string]: string }, zone: string }[] = new Array(this.curators.length);
 
   private destroy$ = new Subject<void>();
 
-  constructor(private studentsService: StudentsService, private cdr: ChangeDetectorRef) {
+  constructor(private cdr: ChangeDetectorRef, private store: Store<AppState>) {
     for (let i = 0; i < this.droppableObjects.length; i++) {
       this.droppableObjects[i] = {
         data: this.curators[i],
@@ -98,22 +98,12 @@ export class HomeComponent {
   }
 
   ngOnInit(): void {
-    this.studentsService.getBufferStudents().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(
-      students => {
-        console.log("update buffer", students);
-        this.bufferStudents = students;
-        this.cdr.markForCheck();
-      });
+    this.store.dispatch(StudentsPageActions.loadStudents());
 
-    this.studentsService.getStudents().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe((students: Student[]) => {
-      console.log("got students from service", students);
-      this.students = students;
-      this.students2 = [...this.students];
-      this.students3 = [...this.students];
+    this.store.select(selectBufferStudents).pipe(
+      takeUntil(this.destroy$),
+    ).subscribe((bufferStudents) => {
+      this.bufferStudents = [...bufferStudents];
       this.cdr.markForCheck();
     });
   }
@@ -130,12 +120,12 @@ export class HomeComponent {
 
   onEdit(e: Event, student: Student): void {
     console.log("on edit", student);
-    this.studentsService.setStudentToEdit(student);
+    this.store.dispatch(StudentsPageActions.selectStudent({ student }));
   }
 
   onDelete(e: Event, student: Student): void {
     console.log("on delete", student);
-    this.studentsService.setStudentToEdit(student);
+    this.store.dispatch(StudentsPageActions.selectStudent({ student }));
   }
 
   onOpenInput(e: MouseEvent, column: string): void {
@@ -147,9 +137,9 @@ export class HomeComponent {
     let value = val.toLowerCase();
 
     const keys = Object.keys(this.headers) as Array<keyof Student>;
-    const key: keyof Student | undefined = keys.find((key) => this.headers[key] === column);
+    const key: keyof Student | undefined = keys.find((k) => this.headers[k] === column);
 
-    if(!key) return;
+    if (!key) { return; }
 
     if (value) {
       value = value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -171,10 +161,9 @@ export class HomeComponent {
 
   onToggleDown(col: string): void {
     const keys = Object.keys(this.headers) as Array<keyof Student>;
-    const key: keyof Student | undefined = keys.find((key) => this.headers[key] === col);
-    // console.log(key);
+    const key: keyof Student | undefined = keys.find((k) => this.headers[k] === col);
 
-    if (!key) return;
+    if (!key) { return; }
 
     if (this.downFlags[col]) {
       this.downFlags[col] = false;
@@ -188,7 +177,7 @@ export class HomeComponent {
       }
     } else {
       this.downFlags[col] = true;
-      Object.keys(this.downFlags).forEach((key) => { if (key !== col) this.downFlags[key] = false });
+      Object.keys(this.downFlags).forEach((k) => { if (k !== col) { this.downFlags[k] = false; } });
 
       if (col === "Дата Рождения") {
         this.sortDate(key);
@@ -218,49 +207,49 @@ export class HomeComponent {
 
   sortDate(key: keyof Student): void {
     const sortedStudents: Student[] = this.bufferStudents.sort((a: Student, b: Student) =>
-      this.convertToDate(a[key]).getTime() - this.convertToDate(b[key]).getTime()
+      this.convertToDate(a[key]).getTime() - this.convertToDate(b[key]).getTime(),
     );
-    this.bufferStudents = sortedStudents;
+    this.store.dispatch(StudentsPageActions.setStudentsBuffer({ bufferStudents: sortedStudents }));
   }
 
   descendingSortDate(key: keyof Student): void {
     const sortedStudents: Student[] = this.bufferStudents.sort((a: Student, b: Student) =>
-      this.convertToDate(b[key]).getTime() - this.convertToDate(a[key]).getTime()
+      this.convertToDate(b[key]).getTime() - this.convertToDate(a[key]).getTime(),
     );
-    this.bufferStudents = sortedStudents;
+    this.store.dispatch(StudentsPageActions.setStudentsBuffer({ bufferStudents: sortedStudents }));
   }
 
   sortSmallToLarge(key: keyof Student): void {
     const sortedStudents: Student[] = this.bufferStudents.sort((a: Student, b: Student) =>
-      this.convertToNumber(a[key]) - this.convertToNumber(b[key])
+      this.convertToNumber(a[key]) - this.convertToNumber(b[key]),
     );
-    this.bufferStudents = sortedStudents;
+    this.store.dispatch(StudentsPageActions.setStudentsBuffer({ bufferStudents: sortedStudents }));
   }
 
   sortLargeToSmall(key: keyof Student): void {
     const sortedStudents: Student[] = this.bufferStudents.sort((a: Student, b: Student) =>
-      this.convertToNumber(b[key]) - this.convertToNumber(a[key])
+      this.convertToNumber(b[key]) - this.convertToNumber(a[key]),
     );
-    this.bufferStudents = sortedStudents;
+    this.store.dispatch(StudentsPageActions.setStudentsBuffer({ bufferStudents: sortedStudents }));
   }
 
   sortAlphabetically(key: keyof Student): void {
     const sortedStudents: Student[] = this.bufferStudents.sort((a: Student, b: Student) =>
-      a[key].localeCompare(b[key])
+      a[key].localeCompare(b[key]),
     );
-    this.bufferStudents = sortedStudents;
+    this.store.dispatch(StudentsPageActions.setStudentsBuffer({ bufferStudents: sortedStudents }));
   }
 
   sortBackward(key: keyof Student): void {
     const sortedStudents: Student[] = this.bufferStudents.sort((a: Student, b: Student) =>
-      b[key].localeCompare(a[key])
+      b[key].localeCompare(a[key]),
     );
-    this.bufferStudents = sortedStudents;
+    this.store.dispatch(StudentsPageActions.setStudentsBuffer({ bufferStudents: sortedStudents }));
   }
 
   setStudents(filteredStudents: Student[]): void {
     console.log(filteredStudents);
-    this.studentsService.setBufferStudents(filteredStudents);
+    this.store.dispatch(StudentsPageActions.setStudentsBuffer({ bufferStudents: filteredStudents }));
   }
 
   setStudents2(filteredRows: Student[]): void {

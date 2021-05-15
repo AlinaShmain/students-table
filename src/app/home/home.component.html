@@ -38,9 +38,9 @@
             (column === 'Дата Рождения' || column === 'Средний Балл') &&
             openFlags[column]
           "
-          [students]="students"
-          [students2]="students2"
-          [students3]="students3"
+          [students]="students$ | async"
+          [students2]="students$ | async"
+          [students3]="students$ | async"
           [column]="column"
           (emitSetStudents)="setStudents($event)"
           (emitSetStudents2)="setStudents2($event)"
@@ -121,7 +121,9 @@
 
 <div class="display-average-score" *ngIf="isActivateCalculate">
   <span>Показатель успеваемости группы:</span>
-  <span class="score-value">{{ bufferStudents | getScores | calculateAverage }}</span>
+  <span class="score-value">{{
+    bufferStudents | getScores | calculateAverage
+  }}</span>
 </div>
 
 <div class="drop-zones-container" *ngIf="isGrouping">
@@ -142,7 +144,9 @@
     >
     <table class="courators-table">
       <tr *ngFor="let group of groupedRows[dropZone.zone]">
-        <td *ngFor="let column of group | getKeys">{{ headers[column] !== "№" ? group[column] : '' }}</td>
+        <td *ngFor="let column of group | getKeys">
+          {{ headers[column] !== "№" ? group[column] : "" }}
+        </td>
       </tr>
     </table>
   </div>

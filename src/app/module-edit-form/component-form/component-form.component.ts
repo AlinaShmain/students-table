@@ -1,11 +1,14 @@
+import { Location } from "@angular/common";
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from "@angular/core";
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
-import { takeUntil } from "rxjs/operators";
+import { Store } from "@ngrx/store";
 import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 import { Student } from "src/app/services/student";
 import { StudentsService } from "src/app/services/students.service";
-import { Location } from '@angular/common';
+import { StudentsPageActions } from "src/app/store/actions";
+import { AppState, selectSelectedStudent, selectStudentsLength } from "src/app/store/state/app.state";
 
 interface AllValidationControlErrors {
   controlName: string;
@@ -52,15 +55,15 @@ export class ComponentFormComponent implements OnInit, OnDestroy {
   isOpenCreateContent: boolean = false;
   isOpenEditContent: boolean = false;
 
-  studentToEdit: Student | undefined;
+  studentToEdit: Student | null = null;
 
-  students: Student[] = [];
+  studentsLength: number | undefined;
 
   private destroy$ = new Subject<void>();
 
   private history: string[] = [];
 
-  constructor(private _fb: FormBuilder, private activeRoute: ActivatedRoute, private router: Router, private studentsService: StudentsService, private cdr: ChangeDetectorRef, private location: Location) {
+  constructor(private _fb: FormBuilder, private activeRoute: ActivatedRoute, private router: Router, private location: Location, private store: Store<AppState>) {
     this.name = {
       firstName: "",
       lastName: "",
@@ -89,9 +92,9 @@ export class ComponentFormComponent implements OnInit, OnDestroy {
 
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        this.history.push(event.urlAfterRedirects)
+        this.history.push(event.urlAfterRedirects);
       }
-    })
+    });
   }
 
   goBack(): void {
@@ -99,7 +102,7 @@ export class ComponentFormComponent implements OnInit, OnDestroy {
     if (this.history.length > 0) {
       this.location.back();
     } else {
-      this.router.navigateByUrl('/');
+      this.router.navigateByUrl("/");
     }
   }
 
@@ -119,23 +122,24 @@ export class ComponentFormComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const path = this.activeRoute.snapshot.url[0].path;
-    // console.log("path", path);
     this.isOpenCreateContent = path === "create";
     this.isOpenEditContent = path === "edit";
 
-    const sub = this.studentsService.getStudents().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe((students: Student[]) => {
-      console.log("update in students", students);
-      this.students = students;
-      this.cdr.markForCheck();
+    this.store.select(selectSelectedStudent).pipe(
+      takeUntil(this.destroy$),
+    ).subscribe((student) => {
+      this.studentToEdit = student;
     });
 
-    this.studentToEdit = this.studentsService.getStudentToEdit();
-    console.log("get student to edit", this.studentToEdit);
+    this.store.select(selectStudentsLength).pipe(
+      takeUntil(this.destroy$),
+    ).subscribe((len) => {
+      this.studentsLength = len;
+    });
 
     if (this.isOpenEditContent && this.studentToEdit) {
-      let { lastName, firstName, middleName, dateBirth, averageScore } = this.studentToEdit;
+      const { lastName, firstName, middleName, averageScore } = this.studentToEdit;
+      let { dateBirth } = this.studentToEdit;
       dateBirth = dateBirth.replace(/(\d{2}).(\d{2}).(\d{4})/, "$3-$2-$1");
 
       this.lastName && this.lastName.setValue(lastName);
@@ -289,25 +293,13 @@ export class ComponentFormComponent implements OnInit, OnDestroy {
   }
 
   addNewStudent(student: Student): void {
-    this.studentsService.addStudent(student).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe((student: Student) => {
-      console.log("after post", student);
-      this.students.push(student);
-      // this.router.navigateByUrl("/");
-      this.goBack();
-    });
+    this.store.dispatch(StudentsPageActions.addStudent({ student }));
+    this.goBack();
   }
 
-  editStudent(studentToEdit: Student): void {
-    this.studentsService.editStudent(studentToEdit).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe((editedStudent: Student) => {
-      console.log("after put", editedStudent);
-      this.students.splice(this.students.findIndex((student) => student.id === editedStudent.id), 1, editedStudent);
-      // this.router.navigateByUrl("/");
-      this.goBack();
-    });
+  editStudent(student: Student): void {
+    this.store.dispatch(StudentsPageActions.editStudent({ student }));
+    this.goBack();
   }
 
   onSubmit(): void {
@@ -318,13 +310,14 @@ export class ComponentFormComponent implements OnInit, OnDestroy {
       const date = this.dateBirth.value;
       const dateStr = date.toString().replace(/(\d{4})-(\d{2})-(\d{2})/, "$3.$2.$1");
       const score = this.averageScore.value;
-      let studentToEdit: Student | undefined = this.studentsService.getStudentToEdit();
       let id: string = "0";
-      if (studentToEdit) {
-        id = studentToEdit.id;
+      if (this.studentToEdit) {
+        id = this.studentToEdit.id;
       }
       if (this.isOpenCreateContent) {
-        id = this.students.length.toString();
+        if (this.studentsLength) {
+          id = this.studentsLength.toString();
+        }
       }
       const student = {
         id: id,

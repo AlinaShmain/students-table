@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
-import { Location } from '@angular/common';
-import { NavigationEnd, Router } from '@angular/router';
+import { Location } from "@angular/common";
+import { Component } from "@angular/core";
+import { NavigationEnd, Router } from "@angular/router";
 
 @Component({
-  selector: 'app-page-not-found',
-  templateUrl: './page-not-found.component.html',
-  styleUrls: ['./page-not-found.component.css']
+  selector: "app-page-not-found",
+  templateUrl: "./page-not-found.component.html",
+  styleUrls: ["./page-not-found.component.css"]
 })
 export class PageNotFoundComponent {
 
@@ -14,9 +14,9 @@ export class PageNotFoundComponent {
   constructor(private router: Router, private location: Location) {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        this.history.push(event.urlAfterRedirects)
+        this.history.push(event.urlAfterRedirects);
       }
-    })
+    });
   }
 
   onReturn(): void {
@@ -24,7 +24,7 @@ export class PageNotFoundComponent {
     if (this.history.length > 0) {
       this.location.back();
     } else {
-      this.router.navigateByUrl('/');
+      this.router.navigateByUrl("/");
     }
   }
 

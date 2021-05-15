@@ -1,10 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges } from "@angular/core";
+import { Location } from "@angular/common";
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
+import { Store } from "@ngrx/store";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { Student } from "../services/student";
-import { StudentsService } from "../services/students.service";
-import {Location} from '@angular/common';
+import { StudentsPageActions } from "../store/actions";
+import { AppState, selectSelectedStudent } from "../store/state/app.state";
 
 @Component({
   selector: "app-popup",
@@ -19,19 +21,26 @@ export class PopupComponent implements OnInit, OnDestroy {
 
   private history: string[] = [];
 
-  constructor(private activeRoute: ActivatedRoute, private router: Router, private studentsService: StudentsService, private location: Location) {
+  private studentToDelete: Student | null = null;
+
+  constructor(private activeRoute: ActivatedRoute, private router: Router, private location: Location, private store: Store<AppState>) {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        this.history.push(event.urlAfterRedirects)
+        this.history.push(event.urlAfterRedirects);
       }
-    })
+    });
   }
 
   ngOnInit(): void {
     console.log("popup");
     const path = this.activeRoute.snapshot.url[0].path;
-    // console.log("path", path);
     this.isOpenDeleteContent = path === "delete";
+
+    this.store.select(selectSelectedStudent).pipe(
+      takeUntil(this.destroy$),
+    ).subscribe((student) => {
+      this.studentToDelete = student;
+    });
   }
 
   ngOnDestroy(): void {
@@ -46,27 +55,19 @@ export class PopupComponent implements OnInit, OnDestroy {
     if (this.history.length > 0) {
       this.location.back();
     } else {
-      this.router.navigateByUrl('/');
+      this.router.navigateByUrl("/");
     }
   }
 
   closeModule(): void {
     this.isOpenDeleteContent = false;
-    // this.router.navigateByUrl("/");
     this.goBack();
   }
 
-  onConfirm() {
-    let studentToDelete: Student | undefined = this.studentsService.getStudentToEdit();
-
-    if (studentToDelete) {
-      this.studentsService.deleteStudent(studentToDelete).pipe(
-        takeUntil(this.destroy$)
-      ).subscribe(({ id }) => {
-        console.log("after delete", id);
-        // this.router.navigateByUrl("/");
-        this.goBack();
-      });
+  onConfirm(): void {
+    if (this.studentToDelete) {
+      this.store.dispatch(StudentsPageActions.deleteStudent({ student: this.studentToDelete }));
+      this.goBack();
     }
   }
 

@@ -44,33 +44,34 @@ export class ComponentFilterComponent implements OnInit {
     return this._column || "Unknown";
   }
 
-  private _students: Student[] = [];
+  private _students: Student[] | null = [];
 
-  @Input() set students(value: Student[]) {
+  @Input() set students(value: Student[] | null) {
+    console.log(value);
     this._students = value;
   }
 
-  get students(): Student[] {
+  get students(): Student[] | null {
     return this._students;
   }
 
-  private _students2: Student[] = [];
+  private _students2: Student[] | null = [];
 
-  @Input() set students2(value: Student[]) {
+  @Input() set students2(value: Student[] | null) {
     this._students2 = value;
   }
 
-  get students2(): Student[] {
+  get students2(): Student[] | null {
     return this._students2;
   }
 
-  private _students3: Student[] = [];
+  private _students3: Student[] | null = [];
 
-  @Input() set students3(value: Student[]) {
+  @Input() set students3(value: Student[] | null) {
     this._students3 = value;
   }
 
-  get students3(): Student[] {
+  get students3(): Student[] | null {
     return this._students3;
   }
 
@@ -82,7 +83,7 @@ export class ComponentFilterComponent implements OnInit {
   emitSetStudents3: EventEmitter<Student[]> = new EventEmitter<Student[]>();
 
   ngOnInit(): void {
-    
+
   }
 
   getDay(date: string): number {
@@ -98,6 +99,8 @@ export class ComponentFilterComponent implements OnInit {
   }
 
   onFilterDate(): void {
+    if (!this.students2) { return; }
+
     let filteredStudents = [...this.students2];
 
     if (this.selectedFromDay !== "From" || this.selectedToDay !== "To") {
@@ -178,11 +181,13 @@ export class ComponentFilterComponent implements OnInit {
       localStorage.removeItem("selectedToScore");
     }
     // localStorage.clear();
-    this.emitSetStudents2.emit(this.students);
-    this.emitSetStudents.emit(this.students3);
+    this.students && this.emitSetStudents2.emit(this.students);
+    this.students3 && this.emitSetStudents.emit(this.students3);
   }
 
   onFilterScore(): void {
+    if (!this.students2) { return; }
+
     let filteredStudents = this.students2;
     console.log(filteredStudents);
 
@@ -199,8 +204,6 @@ export class ComponentFilterComponent implements OnInit {
       }
     }
     if (this.selectedFromDay !== "From" || this.selectedToDay !== "To" || this.selectedFromMonth !== "From" || this.selectedToMonth !== "To" || this.selectedFromYear !== "From" || this.selectedToYear !== "To") {
-      // console.log(this.rows2);
-      // this.rows3 = this.rows2;
       this.emitSetStudents3.emit(this.students2);
     }
     this.emitSetStudents2.emit(filteredStudents);

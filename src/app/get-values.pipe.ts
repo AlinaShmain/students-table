@@ -1,8 +1,8 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform } from "@angular/core";
 import { Student } from "./services/student";
 
 @Pipe({
-  name: 'getValues'
+  name: "getValues"
 })
 export class GetValuesPipe implements PipeTransform {
 
